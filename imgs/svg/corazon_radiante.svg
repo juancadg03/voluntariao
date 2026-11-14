@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Corazón radiante estilo Keith Haring: donación / ayuda -->
+  <rect width="400" height="400" fill="#FFF8EC"/>
+  <g stroke="#1C1414" stroke-width="10" stroke-linecap="round" fill="none">
+    <line x1="200" y1="45" x2="200" y2="18"/>
+    <line x1="242" y1="56" x2="255" y2="34"/>
+    <line x1="158" y1="56" x2="145" y2="34"/>
+    <line x1="274" y1="87" x2="296" y2="75"/>
+    <line x1="126" y1="87" x2="104" y2="75"/>
+    <line x1="286" y1="130" x2="312" y2="130"/>
+    <line x1="114" y1="130" x2="88" y2="130"/>
+    <line x1="261" y1="70" x2="279" y2="52"/>
+    <line x1="139" y1="70" x2="121" y2="52"/>
+  </g>
+  <path d="M200,200 C140,160 118,132 134,108 C150,84 186,90 200,116 C214,90 250,84 266,108 C282,132 260,160 200,200 Z"
+        fill="#7A0C1E" stroke="#1C1414" stroke-width="10" stroke-linejoin="round"/>
+</svg>

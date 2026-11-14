@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calida · Detalle de iniciativa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <script src="tema.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="comun.js"></script>
+</head>
+<!-- PT-03 · Detalle de iniciativa (docs/05 §4, UC-08, UC-09, UC-11) -->
+<body class="min-h-screen pb-20 lg:pb-0">
+  <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">Saltar al contenido</a>
+  <div id="barra-prototipo"></div>
+  <header id="encabezado" class="sticky top-0 z-[1100] border-b border-divisor bg-crema/95 backdrop-blur"></header>
+
+  <main id="contenido" class="mx-auto max-w-6xl px-4 pb-10"></main>
+
+  <nav id="menu-inferior" aria-label="Principal" class="fixed inset-x-0 bottom-0 z-[1100] border-t border-divisor bg-white lg:hidden"></nav>
+
+  <!-- Hoja de inscripción (DP-03). <dialog> trae gratis: foco atrapado, Esc para cerrar y fondo oscuro. -->
+  <dialog id="hoja" aria-labelledby="hoja-titulo"
+          class="fixed inset-x-0 bottom-0 top-auto m-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-3xl bg-white p-0 text-tinta shadow-2xl backdrop:bg-tinta/50 sm:inset-0 sm:m-auto sm:max-w-md sm:rounded-3xl">
+    <div class="p-5 sm:p-6">
+      <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-divisor sm:hidden" aria-hidden="true"></div>
+      <div class="flex items-start gap-3">
+        <div class="flex-1">
+          <h2 id="hoja-titulo" class="text-xl font-semibold"></h2>
+          <p id="hoja-faltan" class="text-tinta-suave"></p>
+        </div>
+        <button type="button" data-cerrar class="grid size-11 place-items-center rounded-full hover:bg-crema" id="hoja-cerrar"></button>
+      </div>
+
+      <!-- Vista 1: formulario -->
+      <form id="hoja-form" class="mt-5 space-y-5" novalidate>
+        <div id="hoja-error" role="alert" class="hidden"></div>
+        <fieldset>
+          <legend id="hoja-cantidad-etiqueta" class="font-medium">¿Cuánto aportas?</legend>
+          <div class="mt-2 flex items-center gap-4">
+            <button type="button" id="menos" class="grid size-12 place-items-center rounded-full border-2 border-vino text-vino hover:bg-vino-claro disabled:border-divisor disabled:text-borde disabled:hover:bg-transparent"></button>
+            <output id="cantidad" aria-live="polite" class="min-w-24 text-center text-2xl font-semibold"></output>
+            <button type="button" id="mas" class="grid size-12 place-items-center rounded-full border-2 border-vino text-vino hover:bg-vino-claro disabled:border-divisor disabled:text-borde disabled:hover:bg-transparent"></button>
+          </div>
+          <p id="hoja-maximo" class="mt-2 text-sm text-tinta-suave"></p>
+        </fieldset>
+        <div>
+          <label for="mensaje" class="font-medium">Mensaje para el organizador <span class="font-normal text-tinta-suave">(opcional)</span></label>
+          <textarea id="mensaje" rows="3" maxlength="300" class="mt-1 w-full rounded-lg border border-borde p-3" placeholder="Ej.: llevo delantales"></textarea>
+        </div>
+        <p class="rounded-lg bg-crema p-3 text-sm">Te inscribes como <strong id="hoja-usuario"></strong>. El organizador verá tu nombre y tu correo.</p>
+        <button type="submit" id="confirmar" class="min-h-12 w-full rounded-lg bg-vino font-semibold text-white hover:bg-vino-oscuro disabled:opacity-70">Confirmar inscripción</button>
+      </form>
+
+      <!-- Vista 2: éxito -->
+      <div id="hoja-exito" hidden class="mt-4 text-center">
+        <div class="mx-auto grid size-16 place-items-center rounded-full bg-exito-claro text-exito" id="exito-icono"></div>
+        <p class="mt-3 text-xl font-semibold">¡Listo!</p>
+        <p class="mt-1 text-tinta-suave">Tu inscripción está <strong class="text-aviso">pendiente</strong> hasta que el organizador la confirme. Te avisaremos en tus avisos.</p>
+        <div class="mt-5 grid gap-2">
+          <a href="#" data-fuera="Mis inscripciones (PT-09)" class="grid min-h-12 place-items-center rounded-lg border-2 border-vino font-semibold text-vino hover:bg-vino-claro">Ver mis inscripciones</a>
+          <button type="button" data-cerrar class="min-h-12 rounded-lg bg-vino font-semibold text-white hover:bg-vino-oscuro">Seguir viendo la iniciativa</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Reportar (UC-11) -->
+  <dialog id="reporte" aria-labelledby="reporte-titulo"
+          class="fixed inset-x-0 bottom-0 top-auto m-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-3xl bg-white p-0 text-tinta shadow-2xl backdrop:bg-tinta/50 sm:inset-0 sm:m-auto sm:max-w-md sm:rounded-3xl">
+    <form id="reporte-form" class="space-y-4 p-5 sm:p-6" novalidate>
+      <h2 id="reporte-titulo" class="text-xl font-semibold">Reportar esta iniciativa</h2>
+      <fieldset>
+        <legend class="font-medium">Motivo</legend>
+        <div class="mt-2 grid gap-2">
+          <label class="flex min-h-11 items-center gap-3 rounded-lg border border-borde px-3"><input type="radio" name="motivo" value="fraude" class="size-5 accent-vino" required> Posible fraude</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg border border-borde px-3"><input type="radio" name="motivo" value="inapropiado" class="size-5 accent-vino"> Contenido inapropiado</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg border border-borde px-3"><input type="radio" name="motivo" value="falsos" class="size-5 accent-vino"> Datos falsos</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg border border-borde px-3"><input type="radio" name="motivo" value="otro" class="size-5 accent-vino"> Otro</label>
+        </div>
+        <p id="motivo-error" class="mt-1 hidden text-sm text-error">Elige un motivo.</p>
+      </fieldset>
+      <div>
+        <label for="reporte-texto" class="font-medium">Cuéntanos qué pasa</label>
+        <textarea id="reporte-texto" rows="3" class="mt-1 w-full rounded-lg border border-borde p-3"></textarea>
+      </div>
+      <div class="grid gap-2 sm:grid-cols-2">
+        <button type="button" data-cerrar class="min-h-12 rounded-lg border-2 border-borde font-semibold hover:bg-crema">Cancelar</button>
+        <button type="submit" class="min-h-12 rounded-lg bg-error font-semibold text-white hover:opacity-90">Enviar reporte</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    pintarBarraPrototipo(`
+      <label class="flex flex-col gap-1">
+        <span>Al confirmar la inscripción, la API responde</span>
+        <select id="proto-respuesta" class="rounded-lg border border-borde bg-white px-2 py-1.5">
+          <option value="ok">201 Creada</option>
+          <option value="sin-cupo">409 Sin cupo</option>
+        </select>
+      </label>`);
+    pintarNavegacion('inicio');
+
+    const rol = rolActual();
+    const id = Number(new URLSearchParams(location.search).get('id') ?? 1);
+    const ini = INICIATIVAS.find((i) => i.id === id);
+    const main = document.getElementById('contenido');
+
+    const SINGULAR = { personas: 'persona', mercados: 'mercado', viajes: 'viaje', botiquines: 'botiquín', 'plántulas': 'plántula', kits: 'kit' };
+    const unidad = (n, cantidad) => (cantidad === 1 ? SINGULAR[n.unidad] ?? n.unidad : n.unidad);
+
+    if (!ini) {
+      // PT-18 · No encontrada (equivale a un 404 de GET /api/iniciativas/:id)
+      main.innerHTML = `
+        <div class="mx-auto mt-10 max-w-md text-center">
+          <img src="recursos/gato_delineado.svg" alt="" class="mx-auto h-32">
+          <h1 class="mt-4 text-2xl font-bold">No encontramos esa iniciativa</h1>
+          <p class="mt-1 text-tinta-suave">Puede que ya no esté publicada.</p>
+          <a href="index.html" class="mt-5 inline-grid min-h-11 place-items-center rounded-lg bg-vino px-5 font-semibold text-white">Ver iniciativas</a>
+        </div>`;
+    } else {
+      document.title = `Calida · ${ini.titulo}`;
+      pintarDetalle();
+    }
+
+    // ─── Detalle ──────────────────────────────────────────────────────────────
+    function pintarDetalle() {
+      const esDueno = rol === 'organizacion' && ini.organizador === USUARIO_DEMO.organizacion.nombre;
+      main.innerHTML = `
+        <div class="flex items-center justify-between py-3">
+          <a href="index.html" id="volver" class="inline-flex min-h-11 items-center gap-1 rounded-lg pr-3 font-medium text-vino hover:underline">${icono('atras')} Volver al listado</a>
+          <button type="button" id="compartir" class="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 font-medium text-vino hover:bg-vino-claro">${icono('compartir')} Compartir</button>
+        </div>
+
+        <div class="lg:grid lg:grid-cols-[1fr_400px] lg:items-start lg:gap-8">
+          <article>
+            <div class="grid aspect-video place-items-center overflow-hidden rounded-3xl bg-${ini.tinte}">
+              <img src="recursos/${ini.ilustracion}.svg" alt="" class="h-40 w-auto max-w-[70%] object-contain sm:h-56">
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">${chip(ini.categoria)} ${insignia('publicada')}</div>
+            <h1 class="mt-3 text-2xl font-bold leading-tight sm:text-3xl">${esc(ini.titulo)}</h1>
+            <p class="mt-1 flex items-center gap-1 text-tinta-suave">por <strong class="font-semibold text-tinta">${esc(ini.organizador)}</strong>
+              ${ini.verificada ? `<span class="inline-flex items-center gap-1 text-sm text-exito">${icono('verificada', 'size-4')}verificada</span>` : ''}</p>
+
+            <dl class="mt-4 space-y-2">
+              <div class="flex gap-3"><dt class="text-vino">${icono('calendario')}<span class="sr-only">Fecha</span></dt><dd>${fechaLarga(ini.fecha)}</dd></div>
+              <div class="flex gap-3"><dt class="text-vino">${icono('ubicacion')}<span class="sr-only">Lugar</span></dt><dd>${esc(ini.lugar)}, ${esc(ini.zona)}</dd></div>
+            </dl>
+
+            <div id="mapa" role="img" aria-label="Mapa con la ubicación de ${esc(ini.lugar)}" class="relative z-0 mt-4 h-48 overflow-hidden rounded-2xl ring-1 ring-divisor sm:h-64"></div>
+            <a href="https://www.openstreetmap.org/?mlat=${ini.lat}&mlon=${ini.lng}#map=17/${ini.lat}/${ini.lng}" target="_blank" rel="noopener" class="mt-1 inline-block text-sm text-vino underline">Abrir en el mapa completo</a>
+
+            <h2 class="mt-6 text-xl font-semibold">Sobre la iniciativa</h2>
+            <p class="mt-2 max-w-prose">${esc(ini.descripcion)}</p>
+
+            <h2 class="mt-6 text-xl font-semibold">Tipos de ayuda</h2>
+            <div class="mt-2 flex flex-wrap gap-2">${ini.tiposAyuda.map((t) => chip(t, 'bg-white text-tinta ring-1 ring-borde')).join('')}</div>
+          </article>
+
+          <aside class="mt-8 lg:sticky lg:top-24 lg:mt-0" aria-labelledby="titulo-necesidades">
+            ${esDueno ? `<a href="#" data-fuera="Gestionar iniciativa (PT-08)" class="mb-4 grid min-h-12 place-items-center rounded-lg bg-tinta font-semibold text-white">Gestionar mi iniciativa</a>` : ''}
+            <h2 id="titulo-necesidades" class="text-xl font-semibold">Necesidades</h2>
+            <ul id="necesidades" class="mt-3 space-y-3"></ul>
+
+            <a href="https://wa.me/${ini.contacto}" target="_blank" rel="noopener"
+               class="mt-5 flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-vino bg-white font-semibold text-vino hover:bg-vino-claro">
+              ${icono('mensaje')} Contactar al grupo</a>
+            <p class="mt-1 text-center text-sm text-tinta-suave">Abre WhatsApp. No necesitas cuenta.</p>
+
+            <button type="button" id="abrir-reporte" class="mx-auto mt-4 flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm text-tinta-suave underline hover:text-error">
+              ${icono('bandera', 'size-4')} Reportar esta iniciativa</button>
+          </aside>
+        </div>`;
+
+      pintarNecesidades();
+      pintarMapa();
+
+      // Volver: si venimos del listado, "atrás" conserva los filtros (DP-06)
+      document.getElementById('volver').addEventListener('click', (e) => {
+        if (document.referrer.includes('index.html') || document.referrer.endsWith('/')) { e.preventDefault(); history.back(); }
+      });
+      document.getElementById('compartir').addEventListener('click', async () => {
+        try {
+          if (navigator.share) await navigator.share({ title: ini.titulo, url: location.href });
+          else { await navigator.clipboard.writeText(location.href); avisar('Enlace copiado.'); }
+        } catch { /* el usuario canceló */ }
+      });
+      document.getElementById('abrir-reporte').addEventListener('click', abrirReporte);
+    }
+
+    function pintarMapa() {
+      if (!window.L) return;   // sin conexión: el texto de la dirección sigue ahí
+      const mapa = L.map('mapa', { scrollWheelZoom: false }).setView([ini.lat, ini.lng], 15);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '&copy; colaboradores de OpenStreetMap',
+      }).addTo(mapa);
+      // Marcador HTML (divIcon) con los colores de Calida, en vez de la imagen azul de Leaflet
+      const pin = L.divIcon({
+        className: '',
+        html: '<span class="block size-6 rounded-full border-4 border-white bg-vino shadow-lg"></span>',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      });
+      L.marker([ini.lat, ini.lng], { icon: pin, keyboard: false, title: ini.lugar }).addTo(mapa);
+
+      // Leaflet mide el contenedor al crearse. Si su tamaño cambia después (aquí,
+      // porque Tailwind genera los estilos en el navegador un instante más tarde),
+      // hay que avisarle para que recalcule y vuelva a centrar.
+      new ResizeObserver(() => {
+        mapa.invalidateSize();
+        mapa.setView([ini.lat, ini.lng], mapa.getZoom(), { animate: false });
+      }).observe(document.getElementById('mapa'));
+    }
+
+    // ─── Necesidades: el botón cambia según rol y estado ──────────────────────
+    function pintarNecesidades() {
+      const inscritas = misInscripciones();
+      document.getElementById('necesidades').innerHTML = ini.necesidades.map((n) => {
+        const resta = faltan(n);
+        let accion;
+        if (inscritas[n.id]) {
+          accion = `<p class="flex flex-wrap items-center gap-2">${insignia('inscrito')}<span class="text-sm text-tinta-suave">Aportas ${inscritas[n.id]} ${esc(unidad(n, inscritas[n.id]))}</span></p>`;
+        } else if (resta === 0) {
+          accion = '';
+        } else if (rol === 'visitante') {
+          const siguiente = encodeURIComponent(`detalle.html?id=${ini.id}`);
+          accion = `<a href="entrar.html?siguiente=${siguiente}" class="grid min-h-11 place-items-center rounded-lg bg-vino font-semibold text-white hover:bg-vino-oscuro">Regístrate para participar</a>`;
+        } else if (rol === 'voluntario') {
+          accion = `<button type="button" data-necesidad="${n.id}" class="min-h-11 w-full rounded-lg bg-vino font-semibold text-white hover:bg-vino-oscuro">Quiero participar</button>`;
+        } else {
+          accion = '<p class="text-sm text-tinta-suave">Solo las cuentas de voluntario pueden inscribirse.</p>';
+        }
+        return `
+          <li class="space-y-2 rounded-2xl bg-white p-4 ring-1 ring-divisor">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="font-semibold">${esc(n.nombre)}</h3>
+              ${insignia(estadoNecesidad(n))}
+            </div>
+            <p class="text-sm"><strong>${n.confirmada} de ${n.objetivo}</strong> ${esc(n.unidad)}
+              ${resta > 0 ? `<span class="text-tinta-suave">· faltan ${resta}</span>` : ''}</p>
+            ${barraProgreso(n, `${n.nombre}: ${n.confirmada} de ${n.objetivo} ${n.unidad}`)}
+            ${accion}
+          </li>`;
+      }).join('');
+
+      document.querySelectorAll('[data-necesidad]').forEach((b) =>
+        b.addEventListener('click', () => abrirHoja(ini.necesidades.find((n) => n.id === Number(b.dataset.necesidad)), b)));
+    }
+
+    // ─── Hoja de inscripción: los 3 pasos de RNF-013 ──────────────────────────
+    // Paso 1: "Quiero participar" · Paso 2: cantidad (y mensaje) · Paso 3: "Confirmar"
+    const hoja = document.getElementById('hoja');
+    const form = document.getElementById('hoja-form');
+    const salidaCantidad = document.getElementById('cantidad');
+    const btnMenos = document.getElementById('menos');
+    const btnMas = document.getElementById('mas');
+    const btnConfirmar = document.getElementById('confirmar');
+    const cajaError = document.getElementById('hoja-error');
+    document.getElementById('hoja-cerrar').innerHTML = icono('cerrar') + '<span class="sr-only">Cerrar</span>';
+    btnMenos.innerHTML = icono('menos', 'size-6') + '<span class="sr-only">Uno menos</span>';
+    btnMas.innerHTML = icono('mas', 'size-6') + '<span class="sr-only">Uno más</span>';
+    document.getElementById('exito-icono').innerHTML = icono('check', 'size-8');
+    document.getElementById('hoja-usuario').textContent = `${USUARIO_DEMO.voluntario.nombre} (${USUARIO_DEMO.voluntario.correo})`;
+
+    let necesidad, cantidad, maximo, botonOrigen;
+
+    function pintarCantidad() {
+      salidaCantidad.textContent = `${cantidad} ${unidad(necesidad, cantidad)}`;
+      btnMenos.disabled = cantidad <= 1;
+      btnMas.disabled = cantidad >= maximo;
+      document.getElementById('hoja-maximo').textContent = `Máximo ${maximo}: lo que falta para completar.`;
+    }
+
+    function abrirHoja(n, origen) {
+      necesidad = n; botonOrigen = origen;
+      maximo = faltan(n); cantidad = 1;
+      document.getElementById('hoja-titulo').textContent = n.nombre;
+      document.getElementById('hoja-faltan').textContent = `Faltan ${maximo} ${unidad(n, maximo)}`;
+      document.getElementById('hoja-cantidad-etiqueta').textContent = `¿Cuánto aportas? (${n.unidad})`;
+      form.reset(); form.hidden = false;
+      document.getElementById('hoja-exito').hidden = true;
+      cajaError.className = 'hidden'; cajaError.textContent = '';
+      btnConfirmar.disabled = false; btnConfirmar.textContent = 'Confirmar inscripción';
+      pintarCantidad();
+      hoja.showModal();
+    }
+
+    btnMenos.addEventListener('click', () => { cantidad = Math.max(1, cantidad - 1); pintarCantidad(); });
+    btnMas.addEventListener('click', () => { cantidad = Math.min(maximo, cantidad + 1); pintarCantidad(); });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      btnConfirmar.disabled = true;
+      btnConfirmar.textContent = 'Enviando…';
+      // Simula POST /api/necesidades/:id/inscripciones
+      setTimeout(() => {
+        if (document.getElementById('proto-respuesta').value === 'sin-cupo') {
+          // 409: otro voluntario tomó el cupo mientras tanto (por eso existe FOR UPDATE, 04 §7.3)
+          maximo = 1; cantidad = 1; pintarCantidad();
+          cajaError.className = 'flex gap-2 rounded-lg bg-error-claro p-3 text-sm text-error';
+          cajaError.innerHTML = `${icono('alerta')}<span>Mientras decidías, otras personas se inscribieron. Ahora falta ${maximo} ${esc(unidad(necesidad, maximo))}. Ajustamos la cantidad.</span>`;
+          btnConfirmar.disabled = false; btnConfirmar.textContent = 'Confirmar inscripción';
+          return;
+        }
+        registrarInscripcion(necesidad.id, cantidad);
+        form.hidden = true;
+        document.getElementById('hoja-exito').hidden = false;
+        pintarNecesidades();
+      }, 700);
+    });
+
+    // ─── Reporte ──────────────────────────────────────────────────────────────
+    const reporte = document.getElementById('reporte');
+    function abrirReporte() {
+      if (rol === 'visitante') {   // UC-11 A2
+        location.href = `entrar.html?siguiente=${encodeURIComponent(`detalle.html?id=${ini.id}`)}`;
+        return;
+      }
+      document.getElementById('reporte-form').reset();
+      document.getElementById('motivo-error').classList.add('hidden');
+      reporte.showModal();
+    }
+    document.getElementById('reporte-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!e.target.motivo.value) {
+        document.getElementById('motivo-error').classList.remove('hidden');
+        e.target.querySelector('input[name=motivo]').focus();
+        return;
+      }
+      reporte.close();
+      avisar('Reporte enviado. El equipo de Calida lo revisará.');
+    });
+
+    // ─── Cerrar diálogos: botón ✕, botones data-cerrar y clic en el fondo ─────
+    for (const d of [hoja, reporte]) {
+      d.addEventListener('click', (e) => {
+        if (e.target === d || e.target.closest('[data-cerrar]')) d.close();
+      });
+    }
+    // Al cerrar, el foco vuelve al botón que abrió la hoja (o a la lista)
+    hoja.addEventListener('close', () => {
+      if (botonOrigen?.isConnected) return botonOrigen.focus();
+      const titulo = document.getElementById('titulo-necesidades');   // el botón ya no existe
+      titulo.tabIndex = -1;
+      titulo.focus();
+    });
+  </script>
+</body>
+</html>
