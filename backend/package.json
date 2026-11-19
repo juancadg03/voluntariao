@@ -1,0 +1,15 @@
+{
+  "name": "@calida/backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API de Calida: Node + Express (docs/04 §5).",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@calida/compartido": "^0.1.0",
+    "express": "^5.3.0"
+  }
+}

@@ -410,7 +410,7 @@ Lo más valioso es el **motivo**. Dentro de seis meses alguien (tú mismo) pregu
 |---|---|---|---|
 | 1 | Convenciones de Git en [`CONTRIBUTING.md`](../CONTRIBUTING.md): ramas `tipo/descripcion`, commits en español con verbo en infinitivo ("Agregar…", "Corregir…"), todo entra a `main` por Pull Request con "Squash and merge". Plantilla de PR en `.github/`. | Flujo de trabajo en equipo. | ✅ |
 | 2 | Node 24 (LTS) fijado en `.nvmrc` (para `nvm use`) y en `engines` del `package.json`; `.npmrc` con `engine-strict=true` hace que `npm install` falle con otra versión. | Por qué se fijan las versiones. | ✅ |
-| 3 | Monorepo con npm workspaces: `frontend/` (Vite + React), `backend/` (Express), `compartido/` (aquí se mueve `compartido/contratos.js`, pendiente 6 de [04 §14](04-arquitectura.md)). | Qué es un paquete de npm y un *workspace*. | ⏳ |
+| 3 | Monorepo con npm workspaces: `compartido/` (con `contratos.js`, antes en `lib/`), `backend/` (Express 5, `node --watch`) y `frontend/` (React 19 + Vite 8, con proxy `/api` → puerto 3000). `npm run dev` en la raíz levanta los dos. | Qué es un paquete de npm y un *workspace*. | ✅ |
 | 4 | `docker-compose.yml` con PostgreSQL + PostGIS, `.env.example` y el script de migraciones. | Contenedores, variables de entorno, migraciones. | ⏳ |
 | 5 | Esqueleto caminante: `GET /api/salud` consulta la base y la pantalla de React muestra "API y base conectadas". | El *proxy* de Vite y el viaje completo de una petición. | ⏳ |
 | 6 | Los tokens de `prototipo/tema.js` pasan a `frontend/src/index.css`, con la dirección estética de [05 §5.7](05-diseno-de-pantallas.md). | Tailwind compilado con Vite. | ⏳ |
@@ -570,6 +570,7 @@ El cambio tocó cinco documentos:
 | **Monorepo** | Un solo repositorio con varios proyectos (aquí: frontend, backend y compartido). |
 | **MoSCoW** | Método de prioridad: *Must*, *Should*, *Could*, *Won't*. |
 | **MVP / v1** | Primera versión mínima que ya resuelve algo útil. |
+| **Paquete (npm)** | Carpeta con un `package.json`: tiene nombre, versión y dependencias, y otros paquetes lo pueden importar. En Calida hay tres: `@calida/frontend`, `@calida/backend` y `@calida/compartido`. |
 | **ORM** | Librería que traduce objetos del código a tablas y genera el SQL. Calida no usa uno, para aprender SQL directamente. |
 | **Proxy / reescritura** | Un servidor que recibe una petición y la reenvía a otro. Calida lo usa para que la interfaz y la API parezcan un solo sitio. |
 | **Rebanada vertical** | Una función completa, de base de datos a pantalla, construida de una vez. |
