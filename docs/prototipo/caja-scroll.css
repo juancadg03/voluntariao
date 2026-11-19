@@ -1,0 +1,58 @@
+.caja-scroll {
+  display: none;
+}
+
+@media (min-width: 1360px) {
+  .caja-scroll {
+    display: block;
+    position: fixed;
+    left: 1rem;
+    bottom: 1.25rem;
+    width: min(9rem, calc((100vw - 72rem) / 2 - 2rem));
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    container-type: inline-size;
+  }
+
+  .caja-scroll img {
+    position: absolute;
+    display: none;
+    max-width: none;
+    height: auto;
+    filter: grayscale(1) contrast(1.35);
+  }
+
+  /* Alineación según el contorno de cada PNG. Los pies comparten una base. */
+  .caja-scroll img:nth-child(1) {
+    width: 224.4cqw;
+    left: -69.3cqw;
+    bottom: -25.2cqw;
+  }
+
+  .caja-scroll img:nth-child(2) {
+    width: 217.2cqw;
+    left: -67.35cqw;
+    bottom: -33.9cqw;
+  }
+
+  .caja-scroll img:nth-child(3) {
+    width: 218.04cqw;
+    left: -66.24cqw;
+    bottom: -25.76cqw;
+  }
+
+  .caja-scroll img:nth-child(4) {
+    width: 217.2cqw;
+    left: -57.9cqw;
+    bottom: -36.15cqw;
+  }
+
+  .caja-scroll[data-pose="1"] img:nth-child(1),
+  .caja-scroll[data-pose="2"] img:nth-child(2),
+  .caja-scroll[data-pose="3"] img:nth-child(3),
+  .caja-scroll[data-pose="4"] img:nth-child(4) {
+    display: block;
+  }
+}
