@@ -3,3 +3,7 @@ node_modules/
 *.tsbuildinfo
 .env*
 next-env.d.ts
+
+# Ilustraciones originales demasiado grandes para GitHub (ver docs/05 §5.6)
+imgs/svg/finalfinal.svg
+imgs/svg/final.svg
