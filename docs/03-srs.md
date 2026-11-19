@@ -45,7 +45,7 @@ Calida es una aplicación web responsive que permite:
 - Decreto 1377 de 2013 (reglamentación de la Ley 1581).
 - IEEE 830-1998, *Recommended Practice for Software Requirements Specifications*.
 - WCAG 2.1, nivel AA (accesibilidad web).
-- `lib/contratos.js` del repositorio, que define los DTO y estados actuales.
+- `compartido/contratos.js` del repositorio, que define los DTO y estados actuales.
 
 ### 1.5 Visión general del documento
 
@@ -222,7 +222,7 @@ Prioridad según MoSCoW: **M** = obligatorio, **S** = deseable, **C** = opcional
 
 ## 5. Modelo de datos conceptual
 
-Las entidades coinciden con `lib/contratos.js`. Las credenciales (correo y hash de la contraseña) se guardan en una entidad **Usuario**, y cada usuario tiene un **Perfil** con sus datos.
+Las entidades coinciden con `compartido/contratos.js`. Las credenciales (correo y hash de la contraseña) se guardan en una entidad **Usuario**, y cada usuario tiene un **Perfil** con sus datos.
 
 | Entidad | Atributos principales | Relaciones |
 |---|---|---|
@@ -280,7 +280,7 @@ Las entidades coinciden con `lib/contratos.js`. Las credenciales (correo y hash 
 
 ### 7.3 Interfaces de software
 
-- Las rutas de la API deben documentarse con los tipos de `lib/contratos.js` como referencia, por ejemplo `GET /api/iniciativas`, `GET /api/iniciativas/:id` y `POST /api/inscripciones`.
+- Las rutas de la API deben documentarse con los tipos de `compartido/contratos.js` como referencia, por ejemplo `GET /api/iniciativas`, `GET /api/iniciativas/:id` y `POST /api/inscripciones`.
 
 ---
 
@@ -293,7 +293,7 @@ Estas decisiones aún no están cerradas. Cada una tiene una propuesta por defec
 | P-01 | ¿Se acepta "Calida" como nombre definitivo del sistema? | Sí. Nombre usado en todos los documentos. |
 | P-02 | ¿Las organizaciones deben demostrar su existencia formal (NIT, documento) antes de publicar? | No en v1. La verificación es manual, desde el panel del administrador. |
 | P-03 | ¿Cuál es la lista inicial de categorías temáticas? | Salud, educación, infancia, adulto mayor, alimentación, medio ambiente, cultura, derechos humanos e incidencia social. |
-| P-04 | ¿Se confirma que `contratos.ts` debe actualizarse con los nuevos tipos de ayuda (mano de obra, donaciones, transporte, asesoría, difusión, otro)? | **Confirmado:** tipos de ayuda como tabla administrable, ya reflejado en `lib/contratos.js`. |
+| P-04 | ¿Se confirma que `contratos.ts` debe actualizarse con los nuevos tipos de ayuda (mano de obra, donaciones, transporte, asesoría, difusión, otro)? | **Confirmado:** tipos de ayuda como tabla administrable, ya reflejado en `compartido/contratos.js`. |
 | P-05 | ¿Las inscripciones tienen cupo máximo automático, o siempre las confirma el organizador? | El organizador confirma manualmente. Sin cupo automático. |
 | P-06 | ¿Qué proveedor de mapas se usa para el mapa? | **Confirmado:** OpenStreetMap con Leaflet, gratis. |
 | P-07 | ¿Se usará un servicio de correo para avisos? | **Confirmado:** no por ahora. Los avisos son dentro de la plataforma, y tampoco hay correos de cuenta (ADR-22). |

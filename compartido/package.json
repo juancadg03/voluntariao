@@ -1,0 +1,10 @@
+{
+  "name": "@calida/compartido",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Código que usan la interfaz y la API: contratos de datos y, después, los esquemas de Zod.",
+  "type": "module",
+  "exports": {
+    "./contratos": "./contratos.js"
+  }
+}

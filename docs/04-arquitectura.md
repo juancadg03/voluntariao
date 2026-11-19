@@ -155,7 +155,7 @@ La API sigue convenciones REST: la URL nombra el recurso y el método HTTP dice 
 | `GET /api/admin/moderacion` · `POST /api/admin/moderacion/:id` | Administrador | UC-12 | 200 |
 | `GET /api/notificaciones` · `GET /api/notificaciones/sin-leer` | Con sesión | Transversal | 200 |
 
-La lista completa se escribe en la fase de construcción, módulo por módulo. Los cuerpos de petición y respuesta usan los tipos de [`lib/contratos.js`](../lib/contratos.js).
+La lista completa se escribe en la fase de construcción, módulo por módulo. Los cuerpos de petición y respuesta usan los tipos de [`compartido/contratos.js`](../compartido/contratos.js).
 
 **Formato de error común:**
 
@@ -191,7 +191,7 @@ calida/
 │  ├─ scripts/migrar.js        # aplica las migraciones pendientes
 │  └─ server.js                # arranca el servidor
 ├─ compartido/                 # lo usan front y back
-│  ├─ contratos.js             # hoy está en lib/contratos.js; se mueve en la fase 3
+│  ├─ contratos.js             # estados y tipos de datos (antes lib/contratos.js)
 │  └─ esquemas.js              # esquemas Zod (RN-01 a RN-05)
 ├─ db/
 │  ├─ migraciones/             # 001_tablas.sql, 002_indices.sql…
@@ -211,7 +211,7 @@ El modelo de `contratos.ts` necesitaba tres ajustes:
 2. **Tipos de ayuda.** Pasaron de una lista fija a una tabla administrable (`tipos_ayuda`).
 3. **Lenguaje.** Como el proyecto se escribe en JavaScript, los tipos se documentan con JSDoc o con esquemas Zod.
 
-**Resuelto:** `src/types/contratos.ts` se reemplazó por [`lib/contratos.js`](../lib/contratos.js), en JavaScript con JSDoc y alineado con las tablas de esta sección.
+**Resuelto:** `src/types/contratos.ts` se reemplazó por `lib/contratos.js`, que en la fase 3 pasó a [`compartido/contratos.js`](../compartido/contratos.js), en JavaScript con JSDoc y alineado con las tablas de esta sección.
 
 **Cambio de la versión 0.3:** sin Supabase no existe `auth.users`. Se agrega la tabla propia `usuarios`, que guarda el correo y el hash de la contraseña. `perfiles` sigue igual, pero su llave apunta a `usuarios`. Separar credenciales y perfil evita que el hash viaje por accidente en una respuesta de la API.
 
@@ -730,4 +730,4 @@ Las decisiones reemplazadas se conservan tachadas: muestran qué se pensó y por
 3. ~~Decidir cómo limitar peticiones.~~ Resuelto: ADR-24.
 4. ~~Confirmar si se usará PostGIS para distancias o solo para el mapa.~~ Resuelto: ADR-13.
 5. ~~Definir el dominio y el nombre del proyecto.~~ Resuelto: ADR-25. Los servicios se llaman `calida` (interfaz) y `calida-api` (API).
-6. Mover `lib/contratos.js` a `compartido/contratos.js` al crear el monorepo (fase 3).
+6. ~~Mover `lib/contratos.js` a `compartido/contratos.js` al crear el monorepo (fase 3).~~ Hecho.
