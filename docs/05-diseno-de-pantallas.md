@@ -478,7 +478,7 @@ Cuando hace falta un acento con texto, se usa el **par tinte claro + tinta oscur
 | Error | `#B3261E` | 6.5:1 ✅ | Rechazada, Cancelada, errores de formulario. |
 | Foco | `#1E6FD9` | 4.3:1 ✅ (mín. 3:1) | Anillo de foco del teclado, separado 2 px del elemento. |
 
-**Colores de cada estado** (de `lib/contratos.js`):
+**Colores de cada estado** (de `compartido/contratos.js`):
 
 | Grupo | Éxito (verde) | Aviso (ámbar) | Error (rojo) | Neutro (gris) |
 |---|---|---|---|---|

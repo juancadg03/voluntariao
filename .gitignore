@@ -1,9 +1,16 @@
+# Dependencias: se reconstruyen con `npm install` (sí se sube package-lock.json).
 node_modules/
+
+# Lo que genera `npm run build`.
+dist/
 .next/
 *.tsbuildinfo
-.env*
 next-env.d.ts
 
-# Ilustraciones originales demasiado grandes para GitHub (ver docs/05 §5.6)
+# Contraseñas y llaves. Solo se sube .env.example (fase 3, paso 4).
+.env*
+!.env.example
+
+# Ilustraciones originales demasiado grandes para GitHub (ver docs/05 §5.6).
 imgs/svg/finalfinal.svg
 imgs/svg/final.svg

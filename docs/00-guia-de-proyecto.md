@@ -203,7 +203,7 @@ El diseño tiene tres partes. En Calida, las dos primeras están en [04 · Arqui
 | Parte | Pregunta | Estado en Calida |
 |---|---|---|
 | 5.1 Arquitectura | ¿Qué piezas hay y cómo se comunican? | ✅ 04 v0.3 (ADR-01 a ADR-27; ver [L-03](#l-03--el-objetivo-del-proyecto-también-es-un-requisito)) |
-| 5.2 Modelo de datos | ¿Qué tablas hay y qué reglas cumplen? | ✅ 04 §6 y `lib/contratos.js` |
+| 5.2 Modelo de datos | ¿Qué tablas hay y qué reglas cumplen? | ✅ 04 §6 y `compartido/contratos.js` |
 | 5.3 Diseño de pantallas | ¿Cómo se ve y se usa? | ✅ 05 v0.3: inventario, navegación, bocetos, guía visual, dirección estética y [prototipo](prototipo/README.md) |
 
 ### 5.1 Arquitectura
@@ -409,8 +409,8 @@ Lo más valioso es el **motivo**. Dentro de seis meses alguien (tú mismo) pregu
 | Paso | Qué se hace | Qué se aprende | Estado |
 |---|---|---|---|
 | 1 | Convenciones de Git en [`CONTRIBUTING.md`](../CONTRIBUTING.md): ramas `tipo/descripcion`, commits en español con verbo en infinitivo ("Agregar…", "Corregir…"), todo entra a `main` por Pull Request con "Squash and merge". Plantilla de PR en `.github/`. | Flujo de trabajo en equipo. | ✅ |
-| 2 | `.nvmrc` y `engines` con la versión de Node. | Por qué se fijan las versiones. | ⏳ |
-| 3 | Monorepo con npm workspaces: `frontend/` (Vite + React), `backend/` (Express), `compartido/` (aquí se mueve `lib/contratos.js`, pendiente 6 de [04 §14](04-arquitectura.md)). | Qué es un paquete de npm y un *workspace*. | ⏳ |
+| 2 | Node 24 (LTS) fijado en `.nvmrc` (para `nvm use`) y en `engines` del `package.json`; `.npmrc` con `engine-strict=true` hace que `npm install` falle con otra versión. | Por qué se fijan las versiones. | ✅ |
+| 3 | Monorepo con npm workspaces: `compartido/` (con `contratos.js`, antes en `lib/`), `backend/` (Express 5, `node --watch`) y `frontend/` (React 19 + Vite 8, con proxy `/api` → puerto 3000). `npm run dev` en la raíz levanta los dos. | Qué es un paquete de npm y un *workspace*. | ✅ |
 | 4 | `docker-compose.yml` con PostgreSQL + PostGIS, `.env.example` y el script de migraciones. | Contenedores, variables de entorno, migraciones. | ⏳ |
 | 5 | Esqueleto caminante: `GET /api/salud` consulta la base y la pantalla de React muestra "API y base conectadas". | El *proxy* de Vite y el viaje completo de una petición. | ⏳ |
 | 6 | Los tokens de `prototipo/tema.js` pasan a `frontend/src/index.css`, con la dirección estética de [05 §5.7](05-diseno-de-pantallas.md). | Tailwind compilado con Vite. | ⏳ |
@@ -480,7 +480,7 @@ Errores y descubrimientos reales del proyecto. Se agregan a medida que aparecen.
 - Cada decisión debe tener **una sola fuente de verdad**. Cuando una decisión cambia, se revisa todo lo que depende de ella.
 - Los identificadores (UC, RF, RN, ADR) hacen posible esa revisión: se busca el ID y se ve qué toca.
 
-**Resuelto en la fase 2:** `src/types/contratos.ts` se reemplazó por `lib/contratos.js`, en JavaScript con JSDoc y alineado con el modelo de datos de [04 · §6](04-arquitectura.md). El archivo dice en su encabezado cuál es su fuente de verdad. También se encontró otra contradicción, esta vez entre dos documentos: el SRS (P-09) decía "se mantienen los 8 estados", mientras ADR-07 decía 10. Se corrigió el SRS.
+**Resuelto en la fase 2:** `src/types/contratos.ts` se reemplazó por `lib/contratos.js` (en la fase 3 pasó a `compartido/contratos.js`), en JavaScript con JSDoc y alineado con el modelo de datos de [04 · §6](04-arquitectura.md). El archivo dice en su encabezado cuál es su fuente de verdad. También se encontró otra contradicción, esta vez entre dos documentos: el SRS (P-09) decía "se mantienen los 8 estados", mientras ADR-07 decía 10. Se corrigió el SRS.
 
 ### L-02 · Una decisión pequeña toca varios documentos
 
@@ -559,8 +559,10 @@ El cambio tocó cinco documentos:
 | **Hash** | Resultado de una función que convierte un texto en otro, de forma que no se puede volver al original. Sirve para guardar contraseñas sin conocerlas. |
 | **Índice** | Estructura de datos de la base que acelera una búsqueda. |
 | **JSON** | Formato de texto para enviar datos entre la interfaz y la API. |
+| **LTS** | *Long Term Support*: versión de un programa con arreglos de seguridad garantizados por varios años. Node saca una LTS cada octubre (las versiones pares). |
 | **Linter** | Programa que lee el código sin ejecutarlo y avisa de errores probables (una variable que no existe, una que nunca se usa). En Calida: ESLint. |
 | **JWT** | *JSON Web Token*: texto firmado por el servidor que dice quién es el usuario. Si alguien lo modifica, la firma deja de coincidir. Calida lo estudió y lo descartó (ver L-04). |
+| **nvm** | *Node Version Manager*: instala varias versiones de Node y cambia entre ellas. `nvm use` lee la versión del archivo `.nvmrc`. |
 | **Middleware** | Función que se ejecuta antes del controlador en cada petición, por ejemplo para revisar la sesión. |
 | **Migración** | Archivo versionado con un cambio a la estructura de la base de datos. |
 | **Mobile-first** | Diseñar primero para la pantalla del celular y después ampliar para el escritorio. |
@@ -569,6 +571,7 @@ El cambio tocó cinco documentos:
 | **MoSCoW** | Método de prioridad: *Must*, *Should*, *Could*, *Won't*. |
 | **MVP / v1** | Primera versión mínima que ya resuelve algo útil. |
 | **ORM** | Librería que traduce objetos del código a tablas y genera el SQL. Calida no usa uno, para aprender SQL directamente. |
+| **Paquete (npm)** | Carpeta con un `package.json`: tiene nombre, versión y dependencias, y otros paquetes lo pueden importar. En Calida hay tres: `@calida/frontend`, `@calida/backend` y `@calida/compartido`. |
 | **Proxy / reescritura** | Un servidor que recibe una petición y la reenvía a otro. Calida lo usa para que la interfaz y la API parezcan un solo sitio. |
 | **Rebanada vertical** | Una función completa, de base de datos a pantalla, construida de una vez. |
 | **Regla de negocio (RN)** | Ley del dominio que se cumple siempre, sin importar la pantalla. |
