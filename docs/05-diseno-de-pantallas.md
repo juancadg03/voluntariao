@@ -1,7 +1,7 @@
 # 05 · Diseño de pantallas
 
 **Proyecto:** Calida
-**Versión:** 0.2 · **Fecha:** 14/11/2026 · **Estado:** borrador (etapas 1 y 2 hechas; falta probar con usuarios)
+**Versión:** 0.3 · **Fecha:** 18/11/2026 · **Estado:** borrador (etapas 1 y 2 hechas, dirección estética en §5.7; falta probar con usuarios)
 **Relacionados:** [02 · Casos de uso](02-casos-de-uso.md) · [03 · SRS §7.1](03-srs.md) · [04 · Arquitectura](04-arquitectura.md)
 
 > **Dos etapas.** Este documento es la **etapa 1**: qué pantallas hay, cómo se pasa de una a otra, qué contiene cada una (bocetos en texto) y la guía visual. La **etapa 2** es el [prototipo HTML navegable](prototipo/README.md) de PT-01, PT-03 y PT-04, con los colores reales.
@@ -526,6 +526,44 @@ Son las piezas que luego serán componentes de React en `frontend/src/componente
 - **Ilustraciones sueltas** (`persona_caja`, `corazon`, `cristorey`, `ermita`) para estados vacíos y la página 404. También se revisa su peso antes de usarlas: `abrazo.svg` pesa 11 MB.
 - Las ilustraciones decorativas llevan `alt=""` para que el lector de pantalla no las lea.
 
+### 5.7 Dirección estética para React (DP-08)
+
+**Objetivo:** que Calida tenga estilo propio y **no parezca hecha por IA**, sin volver el sistema más complejo. El prototipo ya resolvió la estructura (qué va en cada pantalla). En React se pule la estética, pantalla por pantalla, con las mismas herramientas: Tailwind y los tokens de §5.2.
+
+**De dónde sale el carácter:** de lo que solo Calida tiene, no de efectos.
+
+| Recurso propio | Cómo se usa |
+|---|---|
+| El logo en cursiva vino | En el encabezado y en el pie. Es el rasgo más reconocible. |
+| Las ilustraciones de trazo (`persona_caja`, `cristorey`, `ermita`…) | En los estados vacíos, la página 404 y la cabecera de cada iniciativa sin foto. Cali dibujada a mano. |
+| El collage | Solo en entrada, registro y bienvenida (DP-04). |
+| Los nombres reales de Cali | Siloé, Potrero Grande, La Ermita, comunas. Un texto concreto se siente escrito por alguien de aquí. |
+
+**Lo que hace que una página "parezca hecha por IA"** (se evita):
+
+| Señal | En su lugar |
+|---|---|
+| Degradados violeta o azules, brillos, efecto vidrio (*glassmorphism*). | Fondos planos: crema y blanco. El color lo ponen el vino y las ilustraciones. |
+| Todo dentro de tarjetas con sombra, todas iguales. | Tarjetas solo donde hay algo que se toca (una iniciativa). El resto separado por espacio y tamaño del texto. |
+| Secciones que repiten el mismo molde: título, frase, tres tarjetas con ícono. | Cada pantalla tiene la forma que pide su contenido. |
+| Textos de relleno: "Descubre", "Potencia tu impacto", "Únete a la comunidad". | Textos concretos: "Olla comunitaria en Siloé, faltan 8 personas". Los botones dicen qué pasa: "Ver iniciativas", "Quiero participar". |
+| Emojis como íconos, o una mezcla de estilos de íconos. | Un solo juego de íconos de trazo (el de `comun.js`, estilo Lucide). |
+| Cifras inventadas ("+10.000 voluntarios"). | Solo datos reales del sistema, o ninguno. |
+| Animaciones al hacer scroll en cada sección. | Movimiento solo como respuesta: la tarjeta sube 2 px con el mouse, el botón se hunde al presionarlo. Todo se apaga con `prefers-reduced-motion`. |
+| El mismo radio de borde grande en todo. | Los radios de §5.4: 16 px tarjetas, 8 px botones y campos, círculo en chips. |
+
+**Reglas para no agregar complejidad:**
+- Nada de librerías de componentes (MUI, shadcn) ni de animación (Framer Motion). Tailwind y CSS alcanzan.
+- Cada pieza visual existe **una vez** como componente (`Boton`, `Tarjeta`, `Chip`, §5.5). Si una pantalla necesita otra variante, se agrega al componente, no se copia.
+- Los valores visuales salen de los tokens (`bg-vino`, `text-tinta`), nunca de un color escrito a mano.
+
+**Cómo se pule cada pantalla** (en la fase 4, después de que funciona):
+1. Primero funciona con datos reales de la API, con sus estados (cargando, vacío, error).
+2. Luego se revisa con la tabla de arriba y con la lista de accesibilidad (§6).
+3. Se mira en 360 px y en 1280 px y se compara con la pantalla del prototipo.
+
+**Pendiente (se decide en la fase 4, con la primera pantalla):** la tipografía. Poppins es legible, pero aparece en muchísimas páginas y no aporta carácter. Se probará una fuente con más personalidad **solo para los títulos**, manteniendo una fuente legible para el texto. Máximo dos familias, y se elige mirándolas en la pantalla real, no por nombre.
+
 ## 6. Accesibilidad: lista de revisión (RNF-014)
 
 - [ ] Todo el texto cumple el contraste de §5.2.
@@ -548,6 +586,7 @@ Son las piezas que luego serán componentes de React en `frontend/src/componente
 | DP-05 | Las categorías no tienen color propio. | Un color por categoría. | El administrador puede crear categorías (RF-016); el color no escala y no aporta información esencial. |
 | DP-06 | Filtros guardados en la URL. | Filtros solo en el estado de React. | Se pueden compartir, sobreviven a recargar la página y sincronizan listado y mapa (RF-028). |
 | DP-07 | Formulario de iniciativa en una página con 4 secciones. | Asistente de varias páginas. | Guardar el borrador en cualquier momento (RF-013) es más simple con todo en una página. |
+| DP-08 | Estética con carácter desde los recursos propios (logo, ilustraciones, collage, textos de Cali), con Tailwind y los tokens. Sin librerías de componentes ni de animación (§5.7). | Librería de componentes (MUI, shadcn); la skill de diseño *taste*, con efectos WebGL y sus propias reglas (ver guía [L-05](00-guia-de-proyecto.md#l-05--una-herramienta-de-diseño-trae-sus-propias-reglas)). | Que no parezca hecha por IA sin sumar dependencias. Lo que da carácter es lo que solo Calida tiene, no los efectos. |
 
 ## 8. Pendientes
 

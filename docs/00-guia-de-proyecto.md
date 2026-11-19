@@ -1,7 +1,7 @@
 # 00 · Guía: cómo hacer un proyecto de software
 
 **Proyecto de ejemplo:** Calida
-**Versión:** 0.3 · **Fecha:** 14/11/2026 · **Estado:** viva (se completa fase por fase)
+**Versión:** 0.4 · **Fecha:** 18/11/2026 · **Estado:** viva (se completa fase por fase)
 **Relacionados:** [01 · Diagrama de contexto](01-diagrama-de-contexto.md) · [02 · Casos de uso](02-casos-de-uso.md) · [03 · SRS](03-srs.md) · [04 · Arquitectura](04-arquitectura.md)
 
 ---
@@ -65,8 +65,8 @@ Las flechas de vuelta son importantes: el proceso **no es una línea recta**. Co
 |---|---|---|---|
 | 0 · Idea y visión | ¿Qué problema resolvemos y para quién? | Visión y alcance | ✅ (dentro de 01 y 03) |
 | 1 · Análisis | ¿Qué debe hacer el sistema? | Contexto, casos de uso, SRS | ✅ 01, 02, 03 |
-| 2 · Diseño | ¿Cómo lo vamos a construir? | Arquitectura, modelo de datos, diseño de pantallas | ✅ 04 (v0.3) y 05 (v0.2, con prototipo); falta probar el prototipo con usuarios |
-| 3 · Preparación | ¿Dónde y con qué herramientas trabajamos? | Repositorio, entorno local, CI | ⏳ |
+| 2 · Diseño | ¿Cómo lo vamos a construir? | Arquitectura, modelo de datos, diseño de pantallas | ✅ 04 (v0.3) y 05 (v0.3, con prototipo y dirección estética); falta probar el prototipo con usuarios |
+| 3 · Preparación | ¿Dónde y con qué herramientas trabajamos? | Repositorio, entorno local, CI | 🔄 en curso (§6) |
 | 4 · Construcción | Construir de a poco, una función completa a la vez | Código funcionando | ⏳ |
 | 5 · Pruebas | ¿Funciona y sigue funcionando? | Pruebas automáticas | ⏳ |
 | 6 · Despliegue | ¿Cómo llega a los usuarios? | Sistema en internet | ⏳ |
@@ -204,7 +204,7 @@ El diseño tiene tres partes. En Calida, las dos primeras están en [04 · Arqui
 |---|---|---|
 | 5.1 Arquitectura | ¿Qué piezas hay y cómo se comunican? | ✅ 04 v0.3 (ADR-01 a ADR-27; ver [L-03](#l-03--el-objetivo-del-proyecto-también-es-un-requisito)) |
 | 5.2 Modelo de datos | ¿Qué tablas hay y qué reglas cumplen? | ✅ 04 §6 y `lib/contratos.js` |
-| 5.3 Diseño de pantallas | ¿Cómo se ve y se usa? | ✅ 05 v0.2: inventario, navegación, bocetos, guía visual y [prototipo](prototipo/README.md) |
+| 5.3 Diseño de pantallas | ¿Cómo se ve y se usa? | ✅ 05 v0.3: inventario, navegación, bocetos, guía visual, dirección estética y [prototipo](prototipo/README.md) |
 
 ### 5.1 Arquitectura
 
@@ -383,9 +383,56 @@ Lo más valioso es el **motivo**. Dentro de seis meses alguien (tú mismo) pregu
 
 ## 6. Fase 3 · Preparación del entorno
 
-> ⏳ Se completa cuando lleguemos aquí.
+**¿Qué es?** Dejar listo el lugar donde se va a construir: la estructura de carpetas, las herramientas, la base de datos local, las reglas para trabajar con Git y una revisión automática en cada cambio. Todavía **no** se construye ninguna función del sistema.
 
-Crear el repositorio y sus convenciones (ramas, commits), el entorno local, las herramientas de calidad (lint, formato) y la integración continua.
+**¿Por qué importa?** Si cada persona instala versiones distintas, nombra las ramas a su manera o descubre que "en mi computador sí funciona", el tiempo se va en problemas que no tienen nada que ver con Calida. Preparar el entorno una vez, y escribirlo, hace que cualquiera pueda clonar el repositorio y tener el sistema corriendo en minutos.
+
+**Entregable:**
+- Un repositorio con la estructura de [04 §5.3](04-arquitectura.md) y un `README.md` que explica cómo arrancarlo.
+- Un **esqueleto caminante** (*walking skeleton*): la versión más delgada posible del sistema completo, con todas sus piezas conectadas pero sin funciones reales. En Calida: la pantalla de React le pide a la API su estado, la API le pregunta a la base de datos, y la respuesta llega de vuelta a la pantalla.
+- Lint, formato y una revisión automática (CI) que corre en cada Pull Request.
+
+**Cómo se hace:**
+1. **Acordar las convenciones de Git** antes de que haya código: cómo se nombran las ramas, cómo se escriben los commits y cómo entra un cambio a `main`.
+2. **Fijar las versiones** de las herramientas (Node, PostgreSQL), para que todos usen las mismas.
+3. **Crear la estructura de carpetas** decidida en el diseño. No hay que inventarla otra vez: ya está en la arquitectura.
+4. **Levantar la base de datos local** con Docker, para no instalar PostgreSQL a mano en cada computador.
+5. **Conectar las piezas de punta a punta** con el caso más simple posible (el esqueleto caminante).
+6. **Agregar las herramientas de calidad:** un *linter* (encuentra errores probables) y un formateador (ordena el estilo del código solo).
+7. **Automatizar la revisión** con integración continua (CI): un servidor que, en cada Pull Request, instala todo y corre el lint (y más adelante las pruebas).
+8. **Escribir el `README.md`** con los pasos para arrancar, y probarlos desde un clon limpio.
+
+> **¿Por qué un esqueleto y no la primera función?** Porque conectar React, Express y PostgreSQL tiene sus propios problemas (puertos, el *proxy*, variables de entorno, la conexión a la base). Si aparecen junto con la lógica de las iniciativas, no se sabe si el error está en la conexión o en la función. Con el esqueleto se resuelven primero y por separado. Es lo mismo que probar un algoritmo con un caso pequeño antes que con el grande.
+
+**En Calida:** casi todo ya se decidió en el diseño ([04 §4](04-arquitectura.md) stack, [§5.3](04-arquitectura.md) carpetas, [§11](04-arquitectura.md) entornos). Esta fase lo vuelve real, paso por paso:
+
+| Paso | Qué se hace | Qué se aprende | Estado |
+|---|---|---|---|
+| 1 | Convenciones de Git en [`CONTRIBUTING.md`](../CONTRIBUTING.md): ramas `tipo/descripcion`, commits en español con verbo en infinitivo ("Agregar…", "Corregir…"), todo entra a `main` por Pull Request con "Squash and merge". Plantilla de PR en `.github/`. | Flujo de trabajo en equipo. | ✅ |
+| 2 | `.nvmrc` y `engines` con la versión de Node. | Por qué se fijan las versiones. | ⏳ |
+| 3 | Monorepo con npm workspaces: `frontend/` (Vite + React), `backend/` (Express), `compartido/` (aquí se mueve `lib/contratos.js`, pendiente 6 de [04 §14](04-arquitectura.md)). | Qué es un paquete de npm y un *workspace*. | ⏳ |
+| 4 | `docker-compose.yml` con PostgreSQL + PostGIS, `.env.example` y el script de migraciones. | Contenedores, variables de entorno, migraciones. | ⏳ |
+| 5 | Esqueleto caminante: `GET /api/salud` consulta la base y la pantalla de React muestra "API y base conectadas". | El *proxy* de Vite y el viaje completo de una petición. | ⏳ |
+| 6 | Los tokens de `prototipo/tema.js` pasan a `frontend/src/index.css`, con la dirección estética de [05 §5.7](05-diseno-de-pantallas.md). | Tailwind compilado con Vite. | ⏳ |
+| 7 | ESLint y Prettier, con los scripts `npm run lint` y `npm run formato`. | Calidad automática del código. | ⏳ |
+| 8 | GitHub Actions: en cada Pull Request se instala todo y se corre el lint. | Integración continua. | ⏳ |
+| 9 | `README.md` de la raíz, probado desde un clon limpio. | Documentar para otra persona. | ⏳ |
+
+**Pendiente de hablar con el equipo:** en GitHub existe la rama `dev1/modulo-publico` (7/11/2026), hecha con Next.js y TypeScript, es decir, con la arquitectura anterior a ADR-16 y ADR-04. Antes del paso 3 hay que acordar con su autor qué se hace con ella: se puede aprovechar su contenido (pantallas y datos de ejemplo) en la estructura nueva, pero no unirla tal cual. Es otro caso de [L-01](#l-01--los-documentos-y-el-código-se-desalinean).
+
+**Errores comunes:**
+- Construir la primera función sin haber conectado antes las piezas: los errores de configuración se mezclan con los de la lógica.
+- Subir al repositorio el archivo `.env` con contraseñas. Al repositorio solo va `.env.example`, sin valores reales.
+- "Funciona en mi computador": versiones distintas de Node o de PostgreSQL entre personas.
+- Dejar el `README` para el final y que nadie más sepa arrancar el proyecto.
+- Configurar demasiadas herramientas "por si acaso". Cada herramienta debe resolver un problema que ya existe.
+
+**Lista para terminar:**
+- [ ] Las convenciones de Git están escritas y el equipo las conoce.
+- [ ] `npm install` y `npm run dev` levantan la interfaz y la API; `docker compose up` levanta la base.
+- [ ] El esqueleto caminante funciona: la pantalla muestra datos que vinieron de la base.
+- [ ] `npm run lint` pasa, y GitHub Actions lo corre en cada Pull Request.
+- [ ] Otra persona clonó el repositorio y lo arrancó siguiendo solo el `README`.
 
 ## 7. Fase 4 · Construcción iterativa
 
@@ -476,6 +523,15 @@ El cambio tocó cinco documentos:
 - Hacer preguntas "básicas" sobre el diseño no es perder el tiempo: así se encuentran estas contradicciones antes de escribir código.
 - Como la ADR-18 tenía horas y no había código, se corrigió en el mismo lugar, dejando escrita la fecha de la revisión. Si ya hubiera código, se escribiría una ADR nueva que la reemplace.
 
+### L-05 · Una herramienta de diseño trae sus propias reglas
+
+**Qué pasó:** para que el prototipo se viera más atractivo se probó la skill de diseño *taste*. Generó una página de presentación muy pulida, pero con sus propias reglas: cambió la fuente Poppins por otra, impuso "una sección por pantalla", agregó un fondo animado con WebGL, copió 38 MB de archivos al repositorio y necesitó un navegador y varias rondas de revisión. Además, la página nueva enlazaba a las pantallas del prototipo, y las dos versiones quedaron mezcladas. Se borró y el prototipo volvió a su forma sencilla.
+
+**Lección:**
+- Una herramienta que "lo hace todo" decide por ti. Antes de adoptarla, se compara con el objetivo del proyecto (aprender, simplicidad), igual que en [L-03](#l-03--el-objetivo-del-proyecto-también-es-un-requisito).
+- Los experimentos se hacen **aparte** (en otra carpeta o en otra rama) y se evalúan antes de mezclarlos con lo que ya funciona.
+- Lo que sí sirvió fue la lista de lo que hace que una página "parezca hecha por IA". Esa idea, sin la herramienta, quedó como dirección estética en [05 §5.7](05-diseno-de-pantallas.md) (DP-08).
+
 ---
 
 ## 12. Glosario
@@ -487,6 +543,7 @@ El cambio tocó cinco documentos:
 | **API REST** | Forma de organizar un servidor: cada URL es un recurso (`/api/iniciativas`) y el método HTTP dice la acción (`GET` leer, `POST` crear, `PATCH` modificar, `DELETE` borrar). |
 | **bcrypt** | Algoritmo para calcular el hash de contraseñas. Es lento a propósito, para que adivinar contraseñas cueste mucho. |
 | **Camino feliz** | El flujo principal, cuando nada sale mal. |
+| **CI (integración continua)** | Un servidor que, en cada cambio subido, instala el proyecto y corre el lint y las pruebas. Si algo falla, el cambio no entra a `main`. En Calida: GitHub Actions. |
 | **Capa** | Nivel del código con una responsabilidad; solo depende del nivel de abajo. |
 | **Caso de uso (UC)** | Objetivo de un actor y los pasos para lograrlo con el sistema. |
 | **Condición de carrera** | Error que aparece cuando dos operaciones simultáneas leen y escriben el mismo dato. |
@@ -494,12 +551,15 @@ El cambio tocó cinco documentos:
 | **Contenedor** | Programa o servicio que corre por separado (navegador, servidor, base de datos). |
 | **Cookie** | Dato pequeño que el servidor guarda en el navegador y que el navegador devuelve en cada petición. Con `HttpOnly`, JavaScript no puede leerla. |
 | **CORS** | Mecanismo con el que un servidor permite peticiones desde otro origen (otro dominio o puerto). |
+| **Docker** | Herramienta que corre programas dentro de *contenedores*: cajas aisladas con todo lo que el programa necesita. En Calida levanta PostgreSQL sin instalarlo en el computador. |
 | **Dominio** | Capa con las reglas de negocio, sin depender de pantallas ni base de datos. |
+| **Esqueleto caminante** | (*Walking skeleton*) La versión más delgada del sistema completo: todas las piezas conectadas de punta a punta, sin funciones reales todavía. |
 | **Endpoint** | Una ruta concreta de la API, por ejemplo `POST /api/inscripciones`. |
 | **Flujo alternativo** | Lo que pasa cuando un paso falla o hay una variante. |
 | **Hash** | Resultado de una función que convierte un texto en otro, de forma que no se puede volver al original. Sirve para guardar contraseñas sin conocerlas. |
 | **Índice** | Estructura de datos de la base que acelera una búsqueda. |
 | **JSON** | Formato de texto para enviar datos entre la interfaz y la API. |
+| **Linter** | Programa que lee el código sin ejecutarlo y avisa de errores probables (una variable que no existe, una que nunca se usa). En Calida: ESLint. |
 | **JWT** | *JSON Web Token*: texto firmado por el servidor que dice quién es el usuario. Si alguien lo modifica, la firma deja de coincidir. Calida lo estudió y lo descartó (ver L-04). |
 | **Middleware** | Función que se ejecuta antes del controlador en cada petición, por ejemplo para revisar la sesión. |
 | **Migración** | Archivo versionado con un cambio a la estructura de la base de datos. |
@@ -523,5 +583,6 @@ El cambio tocó cinco documentos:
 | **Token de diseño** | Nombre para un valor visual (por ejemplo `vino` = `#661427`). El código usa el nombre, así cambiar el color es cambiar una sola línea. |
 | **Trazabilidad** | Poder seguir un requisito desde su origen hasta el código y la prueba. |
 | **Variable de entorno** | Valor de configuración (como una contraseña de base de datos) que se le da al programa desde afuera, no escrito en el código. |
+| **Workspaces (npm)** | Forma de tener varios paquetes de npm en un solo repositorio (`frontend`, `backend`, `compartido`) que se instalan juntos y pueden importarse entre sí. |
 | **WCAG** | *Web Content Accessibility Guidelines*: reglas para que una página la pueda usar cualquier persona, incluso con baja visión o con lector de pantalla. Calida apunta al nivel AA (RNF-014). |
 | **Wireframe (boceto)** | Dibujo simple de una pantalla, con cajas y textos, que muestra qué va y dónde, sin colores ni detalles. |
