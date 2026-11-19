@@ -1,0 +1,214 @@
+<!doctype html>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  entrar.html · PT-04 · Iniciar sesión
+  ═══════════════════════════════════════════════════════════════════════════
+
+  QUÉ VISTA ES
+    El formulario de correo y contraseña para entrar a Calida.
+    · Diseño: docs/05-diseno-de-pantallas.md §4 (boceto de PT-04), basado en
+      el mockup imgs/mockups/login.png.
+    · Caso de uso: UC-02 "Iniciar sesión" (docs/02-casos-de-uso.md).
+    · En la app real: la ruta "/entrar", con POST /api/cuentas/sesion.
+      El servidor responde con una cookie de sesión (aprendizajes/03-sesiones.md).
+
+  POR QUÉ ESTÁ EN EL PROTOTIPO
+    Es la puerta de entrada para inscribirse y publicar, y tiene varios
+    casos difíciles de imaginar sin probarlos: errores de cada campo, un
+    mensaje que no revela si el correo existe, el bloqueo tras varios
+    intentos y el regreso seguro a la página de la que venías.
+
+  QUÉ PARTES TIENE
+    1. Barra del prototipo: elegir si entras como voluntario u organización.
+    2. Mitad izquierda: la tarjeta con el formulario sobre el collage (DP-04).
+       En el celular es lo único que se ve.
+    3. Mitad derecha: el texto de bienvenida (solo escritorio, como el mockup).
+    Esta pantalla NO tiene encabezado ni menú inferior: es un paso aparte.
+
+  QUÉ PROBAR
+    · Enviar con campos vacíos o un correo mal escrito → error bajo el campo.
+    · Una contraseña mala → "Correo o contraseña incorrectos" (401).
+    · Tres contraseñas malas → bloqueo de 30 s (423). La real: 15 min (RF-007).
+    · La contraseña buena es calida123 → vuelve a la página de "?siguiente=".
+
+  CÓMO SE CONECTA CON LO DEMÁS
+    · comun.js     → guarda el rol elegido (cambiarRol), como si fuera la sesión.
+    · detalle.html → envía aquí al visitante con ?siguiente=detalle.html?id=N.
+    · index.html   → "Ver iniciativas sin cuenta".
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calida · Iniciar sesión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="tema.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+  <script src="comun.js"></script>
+</head>
+<!-- PT-04 · Iniciar sesión (docs/05 §4, UC-02). Basada en imgs/mockups/login.png -->
+<body class="min-h-screen">
+  <div id="barra-prototipo"></div>
+
+  <main class="grid min-h-[calc(100dvh-2.5rem)] lg:grid-cols-2">
+    <!-- Mitad con el collage (DP-04). En móvil ocupa toda la pantalla. -->
+    <section class="flex items-center justify-center bg-[url(recursos/fondo.webp)] bg-cover bg-center px-4 py-10">
+      <div class="w-full max-w-sm rounded-3xl bg-crema p-6 shadow-2xl sm:p-8">
+        <a href="index.html" class="block"><img src="recursos/logo.svg" alt="Calida, ir al inicio" class="mx-auto h-12 w-auto"></a>
+        <h1 class="mt-4 text-center text-2xl font-bold">Iniciar sesión</h1>
+
+        <form id="form" class="mt-6 space-y-4" novalidate>
+          <div id="error-general" role="alert"></div>
+
+          <div>
+            <label for="correo" class="font-medium">Correo</label>
+            <input id="correo" name="correo" type="email" autocomplete="email" inputmode="email"
+                   aria-describedby="correo-error"
+                   class="mt-1 h-12 w-full rounded-lg border border-borde bg-white px-3 aria-[invalid=true]:border-2 aria-[invalid=true]:border-error">
+            <p id="correo-error" class="mt-1 text-sm text-error"></p>
+          </div>
+
+          <div>
+            <label for="contrasena" class="font-medium">Contraseña</label>
+            <div class="relative mt-1">
+              <input id="contrasena" name="contrasena" type="password" autocomplete="current-password"
+                     aria-describedby="contrasena-error"
+                     class="h-12 w-full rounded-lg border border-borde bg-white pl-3 pr-12 aria-[invalid=true]:border-2 aria-[invalid=true]:border-error">
+              <button type="button" id="ver" aria-pressed="false"
+                      class="absolute right-0.5 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-lg text-tinta-suave hover:text-vino"></button>
+            </div>
+            <p id="contrasena-error" class="mt-1 text-sm text-error"></p>
+          </div>
+
+          <button id="entrar" type="submit" class="min-h-12 w-full rounded-lg bg-vino font-semibold text-white hover:bg-vino-oscuro disabled:cursor-not-allowed disabled:opacity-70">Entrar</button>
+        </form>
+
+        <p class="mt-5 text-center text-sm">¿No tienes cuenta?
+          <a href="#" data-fuera="El registro (PT-05)" class="font-semibold text-vino underline">Regístrate</a></p>
+        <p class="mt-2 text-center text-sm text-tinta-suave">¿Olvidaste tu contraseña? Escríbenos a soporte. <span class="sr-only">(La recuperación por correo no está en la versión 1.)</span></p>
+      </div>
+    </section>
+
+    <!-- Mitad de bienvenida: solo escritorio, como en el mockup -->
+    <section class="hidden flex-col justify-center gap-6 bg-crema px-12 lg:flex xl:px-20" aria-labelledby="bienvenida">
+      <h2 id="bienvenida" class="text-4xl font-bold leading-tight">Te damos la bienvenida a <span class="text-vino">Calida</span></h2>
+      <p class="max-w-md text-lg">Encuentra voluntariados e iniciativas ciudadanas en Cali. Elige una causa y colabora.</p>
+      <p class="max-w-md text-lg"><strong>¿Tienes una iniciativa?</strong><br>Compártela y encuentra personas que te ayuden.</p>
+      <a href="index.html" class="inline-flex w-fit items-center gap-2 text-lg font-semibold text-vino underline underline-offset-4">Ver iniciativas sin cuenta →</a>
+    </section>
+  </main>
+
+  <p class="bg-crema py-3 text-center lg:hidden"><a href="index.html" class="font-semibold text-vino underline">Ver iniciativas sin cuenta →</a></p>
+
+  <!-- Lógica de la página: el ojo de la contraseña, la validación, el bloqueo
+       por intentos fallidos y el envío simulado. -->
+  <script>
+    // ─── Controles del prototipo: con qué rol entrar si la contraseña es correcta ─
+    pintarBarraPrototipo(`
+      <label class="flex flex-col gap-1">
+        <span>Entrar como</span>
+        <select id="proto-como" class="rounded-lg border border-borde bg-white px-2 py-1.5">
+          <option value="voluntario">Voluntario</option>
+          <option value="organizacion">Organización</option>
+        </select>
+      </label>
+      <p class="max-w-xs self-center">Contraseña de prueba: <code class="rounded bg-white px-1">calida123</code>. Tres intentos fallidos bloquean 30 s.</p>`);
+
+    const form = document.getElementById('form');
+    const correo = document.getElementById('correo');
+    const contrasena = document.getElementById('contrasena');
+    const btnEntrar = document.getElementById('entrar');
+    const errorGeneral = document.getElementById('error-general');
+    const btnVer = document.getElementById('ver');
+
+    // ─── Mostrar u ocultar la contraseña ──────────────────────────────────────
+    function pintarOjo() {
+      const visible = contrasena.type === 'text';
+      btnVer.setAttribute('aria-pressed', String(visible));
+      btnVer.innerHTML = icono(visible ? 'ojoTachado' : 'ojo') +
+        `<span class="sr-only">${visible ? 'Ocultar' : 'Mostrar'} contraseña</span>`;
+    }
+    btnVer.addEventListener('click', () => {
+      contrasena.type = contrasena.type === 'password' ? 'text' : 'password';
+      pintarOjo();
+    });
+    pintarOjo();
+
+    // ─── Validación: al salir del campo y al enviar (docs/05, PT-07) ──────────
+    const reglas = {
+      correo: (v) => (!v ? 'Escribe tu correo.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Revisa el correo: debe tener la forma nombre@dominio.com.'),
+      contrasena: (v) => (!v ? 'Escribe tu contraseña.' : ''),
+    };
+    function validar(campo) {
+      const mensaje = reglas[campo.name](campo.value.trim());
+      campo.setAttribute('aria-invalid', String(Boolean(mensaje)));
+      document.getElementById(`${campo.id}-error`).textContent = mensaje;
+      return !mensaje;
+    }
+    for (const campo of [correo, contrasena]) {
+      campo.addEventListener('blur', () => campo.value && validar(campo));
+      // Si ya había error, se quita apenas el usuario lo corrige
+      campo.addEventListener('input', () => campo.getAttribute('aria-invalid') === 'true' && validar(campo));
+    }
+
+    // Error general (arriba del formulario), para lo que no es culpa de un solo campo
+    function mostrarError(texto) {
+      errorGeneral.className = 'flex gap-2 rounded-lg bg-error-claro p-3 text-sm text-error';
+      errorGeneral.innerHTML = `${icono('alerta')}<span>${texto}</span>`;
+    }
+
+    // Solo se permite volver a páginas propias: evita la "redirección abierta",
+    // donde un enlace como entrar.html?siguiente=https://sitio-falso.com
+    // mandaría al usuario a otro sitio después de iniciar sesión.
+    function destinoSeguro(valor) {
+      return /^[a-z-]+\.html(\?[\w=&%.-]*)?$/i.test(valor ?? '') ? valor : 'index.html';
+    }
+
+    // ─── Bloqueo temporal tras 3 intentos (RF-007; en la app real: 15 min) ────
+    let fallidos = 0;
+    function bloquear(segundos) {
+      btnEntrar.disabled = true;
+      const tic = () => {
+        if (segundos <= 0) {
+          btnEntrar.disabled = false; btnEntrar.textContent = 'Entrar';
+          errorGeneral.className = ''; errorGeneral.textContent = ''; fallidos = 0;
+          return;
+        }
+        btnEntrar.textContent = `Espera ${segundos} s`;
+        segundos--; setTimeout(tic, 1000);
+      };
+      mostrarError('Demasiados intentos fallidos. Por seguridad, espera un momento antes de volver a intentarlo.');
+      tic();
+    }
+
+    // ─── Enviar: simula POST /api/cuentas/sesion ──────────────────────────────
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      errorGeneral.className = ''; errorGeneral.textContent = '';
+      const okCorreo = validar(correo);
+      const okContrasena = validar(contrasena);
+      if (!okCorreo || !okContrasena) {
+        (okCorreo ? contrasena : correo).focus();   // foco en el primer error
+        return;
+      }
+
+      btnEntrar.disabled = true; btnEntrar.textContent = 'Entrando…';
+      setTimeout(() => {
+        if (contrasena.value !== 'calida123') {
+          fallidos++;
+          if (fallidos >= 3) return bloquear(30);                       // 423
+          btnEntrar.disabled = false; btnEntrar.textContent = 'Entrar';
+          // 401: mensaje genérico, no dice si el correo existe (UC-02 A1)
+          mostrarError('Correo o contraseña incorrectos.');
+          contrasena.value = ''; contrasena.focus();
+          return;
+        }
+        cambiarRol(document.getElementById('proto-como').value);        // 200 + cookie
+        location.href = destinoSeguro(new URLSearchParams(location.search).get('siguiente'));
+      }, 700);
+    });
+  </script>
+</body>
+</html>

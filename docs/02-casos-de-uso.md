@@ -1,7 +1,7 @@
 # 02 · Casos de uso
 
-**Proyecto:** Calidá
-**Versión:** 0.2 · **Fecha:** 12/11/2026 · **Estado:** borrador
+**Proyecto:** Calida
+**Versión:** 0.3 · **Fecha:** 14/11/2026 · **Estado:** borrador
 **Relacionado:** [01 · Diagrama de contexto](01-diagrama-de-contexto.md) · [03 · SRS](03-srs.md)
 
 ---
@@ -45,7 +45,7 @@ flowchart LR
 | ID | Caso de uso | Actor principal | Prioridad |
 |---|---|---|---|
 | UC-01 | Registrarse | Organización, Ciudadano con iniciativa, Voluntario, Visitante | Alta |
-| UC-02 | Iniciar sesión y recuperar contraseña | Organización, Ciudadano, Voluntario, Administrador | Alta |
+| UC-02 | Iniciar sesión | Organización, Ciudadano, Voluntario, Administrador | Alta |
 | UC-03 | Publicar iniciativa | Organización, Ciudadano con iniciativa | Alta |
 | UC-04 | Gestionar necesidades de una iniciativa | Organización, Ciudadano con iniciativa | Alta |
 | UC-05 | Editar o cambiar estado de una iniciativa | Organización, Ciudadano con iniciativa | Alta |
@@ -69,26 +69,25 @@ flowchart LR
 
 - **Actor principal:** Organización, Ciudadano con iniciativa o Voluntario. Un visitante puede iniciar este caso para convertirse en voluntario.
 - **Precondición:** El visitante no tiene sesión iniciada.
-- **Postcondición:** Cuenta creada con rol asignado y correo verificado.
+- **Postcondición:** Cuenta creada con rol asignado. En v1 el correo no se verifica (RF-004 en *Won't*, ADR-22).
 
 **Flujo principal**
 1. El visitante elige el tipo de cuenta: *Organización*, *Ciudadano con iniciativa* o *Voluntario*.
 2. Completa nombre, correo y contraseña. Según el tipo, agrega: ciudad y descripción (organización) o teléfono opcional (ciudadano y voluntario).
 3. Acepta el aviso de privacidad y el tratamiento de datos.
 4. El sistema valida los datos y verifica que el correo no esté registrado.
-5. El sistema crea la cuenta y envía un correo de verificación.
-6. El usuario confirma su correo desde el enlace recibido.
+5. El sistema crea la cuenta e inicia la sesión.
 
 **Flujos alternativos**
-- **A1 (paso 4):** El correo ya existe → el sistema ofrece iniciar sesión o recuperar contraseña.
+- **A1 (paso 4):** El correo ya existe → el sistema ofrece iniciar sesión.
 - **A2 (paso 3):** No acepta el aviso → no se crea la cuenta.
 
 ---
 
-### UC-02 · Iniciar sesión y recuperar contraseña
+### UC-02 · Iniciar sesión
 
 - **Actor principal:** Organización, Ciudadano con iniciativa, Voluntario, Administrador.
-- **Precondición:** La cuenta existe, está verificada y activa.
+- **Precondición:** La cuenta existe y está activa.
 - **Postcondición:** Sesión iniciada con el rol correspondiente.
 
 **Flujo principal**
@@ -99,7 +98,7 @@ flowchart LR
 **Flujos alternativos**
 - **A1 (paso 2):** Credenciales incorrectas → mensaje genérico, sin revelar si el correo existe.
 - **A2 (paso 2):** Demasiados intentos fallidos → bloqueo temporal.
-- **A3:** El usuario pulsa "Olvidé mi contraseña" → el sistema envía un enlace de restablecimiento válido por tiempo limitado.
+- **A3:** El usuario olvidó su contraseña → fuera de v1 (RF-006 en *Won't*, ADR-22). Mientras tanto, el administrador puede ayudarlo manualmente.
 
 **Excepciones**
 - Cuenta suspendida por el administrador → acceso denegado con mensaje de contacto.
@@ -158,7 +157,7 @@ flowchart LR
 2. Modifica los campos permitidos.
 3. El sistema valida los cambios y guarda la fecha de la modificación.
 4. El actor cambia el estado (*en preparación*, *lista*, *realizada*, *completada*, *suspendida*, *cancelada*) cuando corresponda.
-5. El sistema notifica por correo a los voluntarios con inscripción confirmada.
+5. El sistema notifica dentro de la plataforma a los voluntarios con inscripción confirmada.
 
 **Flujos alternativos**
 - **A1 (paso 4):** Cambio a *cancelada* o *suspendida* → la iniciativa sale del listado y del mapa, y se conserva el registro.
@@ -197,7 +196,7 @@ flowchart LR
 5. Los filtros de UC-06 se aplican también al mapa.
 
 **Flujos alternativos**
-- **A1 (paso 1):** El usuario autoriza su ubicación → el sistema centra el mapa en él y permite ordenar por distancia.
+- **A1 (paso 1):** El usuario autoriza su ubicación → el sistema centra el mapa en él. Ordenar por distancia queda fuera de v1 (RF-029, ADR-13).
 - **A2 (paso 1):** No autoriza la ubicación → el mapa se centra en Cali.
 
 ---
@@ -230,7 +229,7 @@ flowchart LR
 1. El voluntario pulsa "Quiero participar" en una necesidad.
 2. Indica la cantidad de personas o unidades que aportará y, opcionalmente, un mensaje.
 3. El sistema toma nombre y correo de su cuenta, valida los datos y registra la inscripción como *pendiente*.
-4. El sistema envía un correo al organizador y confirma al voluntario.
+4. El sistema notifica al organizador en su panel y confirma la inscripción al voluntario en pantalla.
 
 **Flujos alternativos**
 - **A1 (paso 3):** El voluntario ya está inscrito en esa necesidad → el sistema informa y no duplica.
@@ -249,7 +248,7 @@ flowchart LR
 2. El sistema lista las inscripciones con nombre del voluntario, aporte, cantidad, mensaje y estado.
 3. El actor confirma, rechaza o cancela cada inscripción.
 4. El sistema actualiza la cantidad confirmada y el estado de la necesidad.
-5. El sistema notifica por correo al voluntario.
+5. El sistema notifica al voluntario dentro de la plataforma.
 6. Tras la fecha de la actividad, el actor marca la inscripción como *cumplida*.
 
 **Flujos alternativos**
@@ -299,7 +298,7 @@ flowchart LR
 1. El administrador busca un usuario por nombre o correo.
 2. Consulta su perfil, número de iniciativas o inscripciones y fecha de registro.
 3. Verifica una organización, suspende o reactiva la cuenta.
-4. El sistema registra la acción y notifica al usuario por correo.
+4. El sistema registra la acción y notifica al usuario dentro de la plataforma.
 
 ---
 

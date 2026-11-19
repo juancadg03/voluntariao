@@ -1,7 +1,7 @@
 # 01 · Diagrama de contexto
 
-**Proyecto:** Calidá
-**Versión:** 0.2 · **Fecha:** 12/11/2026 · **Estado:** borrador
+**Proyecto:** Calida
+**Versión:** 0.3 · **Fecha:** 14/11/2026 · **Estado:** borrador
 
 ---
 
@@ -19,11 +19,10 @@ flowchart LR
     VIS["👀 Visitante<br/>(sin cuenta)"]
     ADM["🛠️ Administrador"]
 
-    SIS(("Calidá<br/>Oportunidades de voluntariado<br/>e incidencia social en Cali"))
+    SIS(("Calida<br/>Oportunidades de voluntariado<br/>e incidencia social en Cali"))
 
     MAPA["🗺️ Proveedor de mapas<br/>(OpenStreetMap)"]
-    MAIL["✉️ Servicio de correo"]
-    SUPA["🗄️ Supabase<br/>(autenticación, base de datos, fotos)"]
+    FOTOS["🖼️ Cloudinary<br/>(almacenamiento de fotos)"]
     WA["💬 WhatsApp / teléfono<br/>(canal externo)"]
 
     ORG -- "publica iniciativas,<br/>necesidades y contacto" --> SIS
@@ -39,8 +38,7 @@ flowchart LR
     SIS -- "panel, reportes y<br/>cola de moderación" --> ADM
 
     SIS -- "direcciones → coordenadas<br/>y capas del mapa" --> MAPA
-    SIS -- "avisos de inscripción,<br/>cambios de estado" --> MAIL
-    SIS -- "cuentas, sesiones y<br/>almacenamiento" --> SUPA
+    SIS -- "fotos de iniciativas" --> FOTOS
     VOL -. "contacta directamente<br/>al grupo o teléfono" .-> WA
     VIS -. "contacta directamente<br/>al grupo o teléfono" .-> WA
 ```
@@ -60,8 +58,7 @@ flowchart LR
 | Sistema externo | Intercambio | Motivo |
 |---|---|---|
 | Proveedor de mapas (OpenStreetMap con Leaflet) | El sistema envía direcciones y recibe coordenadas; carga las capas del mapa. | Visualizar las iniciativas en el mapa de Cali. |
-| Servicio de correo | El sistema envía avisos de inscripción y de cambios de estado. | Notificar a organizadores y voluntarios. |
-| Supabase | Autenticación (registro, sesiones, recuperación de contraseña), base de datos PostgreSQL y almacenamiento de fotos. | Backend del sistema. |
+| Cloudinary | El sistema envía las fotos de las iniciativas y recibe la dirección (URL) donde quedan publicadas. | Guardar y servir fotos sin ocupar el servidor propio. |
 | WhatsApp / teléfono | Canal externo al sistema. Voluntarios y visitantes abren el enlace del grupo o marcan el número. | Contacto directo. El sistema no gestiona mensajes. |
 
 ## 5. Flujos de información principales
@@ -80,7 +77,7 @@ flowchart LR
 **Dentro del alcance (v1):**
 - Publicación, edición y gestión de iniciativas y necesidades.
 - Exploración por listado y mapa, con filtros por categoría y tipo de ayuda.
-- Inscripción de voluntarios registrados y notificaciones por correo.
+- Inscripción de voluntarios registrados y avisos dentro de la plataforma.
 - Moderación, gestión de usuarios y estadísticas para el administrador.
 
 **Fuera del alcance (v1):**
@@ -89,3 +86,6 @@ flowchart LR
 - Certificación o registro oficial de horas de voluntariado.
 - Gestión de inventario de donaciones.
 - Ciudades distintas a Cali.
+- Correos electrónicos: avisos, verificación de cuenta y recuperación de contraseña (ADR-06, ADR-22).
+
+> **Nota (versión 0.3):** la base de datos y la autenticación ya no aparecen como sistemas externos. Antes las daba Supabase; ahora son parte de Calida (ver [04 · Arquitectura](04-arquitectura.md), ADR-16 a ADR-18). El diagrama de contexto solo muestra lo que está **fuera** de la caja.

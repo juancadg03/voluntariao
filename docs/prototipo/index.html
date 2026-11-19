@@ -1,0 +1,318 @@
+<!doctype html>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  index.html · PT-01 · Inicio: listado de iniciativas y filtros
+  ═══════════════════════════════════════════════════════════════════════════
+
+  QUÉ VISTA ES
+    La pantalla principal de Calida: la primera que ve cualquier persona.
+    Muestra las iniciativas publicadas en tarjetas y deja filtrarlas.
+    · Diseño: docs/05-diseno-de-pantallas.md §4 (boceto de PT-01).
+    · Caso de uso: UC-06 "Explorar iniciativas" (docs/02-casos-de-uso.md).
+    · En la app real: la ruta "/" de React, que llama a GET /api/iniciativas.
+
+  POR QUÉ ESTÁ EN EL PROTOTIPO
+    Es la pantalla más usada y la que más decisiones de diseño reúne:
+    tarjetas, filtros, estados de carga y error, y la diferencia entre
+    visitante y usuario con sesión. Probarla aquí, sin backend, es más
+    barato que descubrir los problemas ya en React.
+
+  QUÉ PARTES TIENE (de arriba abajo)
+    1. Barra amarilla del prototipo (#barra-prototipo). NO es parte del
+       diseño: sirve para cambiar de rol y simular respuestas de la API.
+    2. Encabezado (#encabezado). Lo pinta comun.js según el rol (DP-02).
+    3. Franja de bienvenida (#bienvenida). Solo para visitantes; se puede
+       cerrar (DP-04: el collage solo aparece aquí, en entrar y en registro).
+    4. Filtros (#filtros): texto, categoría, tipo de ayuda y fecha. Se
+       guardan en la URL para poder compartirlos y recargar (DP-06, RF-024).
+    5. Conteo de resultados (#conteo), anunciado al lector de pantalla.
+    6. Resultados (#resultados) y botón "Cargar más" (6 por página).
+    7. Menú inferior (#menu-inferior), solo en el celular (DP-02).
+
+  QUÉ ESTADOS SE PUEDEN VER
+    · Normal: las tarjetas con datos de comun.js.
+    · Cargando: tarjetas grises "esqueleto" (con ?estado=cargando).
+    · Vacío: ningún resultado con esos filtros (UC-06 A1).
+    · Error: la API respondió 500 (con ?estado=error), con botón Reintentar.
+
+  CÓMO SE CONECTA CON LO DEMÁS
+    · tema.js       → colores y fuente (tokens de diseño).
+    · comun.js      → datos de ejemplo, íconos, encabezado, chips, barras.
+    · detalle.html  → cada tarjeta enlaza a detalle.html?id=N.
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calida · Iniciativas en Cali</title>
+  <!-- Fuente Poppins (docs/05 §5.3). "preconnect" abre la conexión antes para que cargue más rápido. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- El ORDEN importa:
+       1. tema.js va antes de Tailwind, para que sus colores ya existan cuando Tailwind lea la página.
+       2. Tailwind (desde un CDN) genera el CSS en el navegador a partir de las clases del HTML.
+       3. comun.js va antes del <script> de esta página, porque ese script usa sus funciones. -->
+  <script src="tema.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+  <script src="comun.js"></script>
+</head>
+<!-- PT-01 · Inicio: listado y filtros (docs/05 §4, UC-06) -->
+<!-- pb-20: deja espacio abajo para que el menú inferior fijo no tape el contenido en el celular -->
+<body class="min-h-screen pb-20 lg:pb-0">
+  <!-- Enlace "Saltar al contenido": invisible hasta el primer Tab. Quien navega con teclado
+       se salta el menú y llega directo a la lista (accesibilidad, docs/05 §6). -->
+  <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">Saltar al contenido</a>
+  <!-- Contenedores vacíos que llena comun.js: la barra del prototipo y el encabezado -->
+  <div id="barra-prototipo"></div>
+  <header id="encabezado" class="sticky top-0 z-30 border-b border-divisor bg-crema/95 backdrop-blur"></header>
+
+  <main id="contenido" class="mx-auto max-w-6xl px-4 pb-10">
+
+    <!-- Franja de bienvenida: solo visitantes; se puede cerrar (DP-04) -->
+    <section id="bienvenida" hidden aria-label="Bienvenida"
+             class="relative mt-4 overflow-hidden rounded-3xl bg-[url(recursos/fondo.webp)] bg-cover bg-center p-4 sm:p-8">
+      <div class="max-w-md rounded-2xl bg-crema p-5 shadow-lg sm:p-6">
+        <button id="cerrar-bienvenida" type="button" class="absolute right-3 top-3 grid size-11 place-items-center rounded-full bg-crema text-tinta shadow hover:bg-white"></button>
+        <p class="text-2xl font-bold text-vino sm:text-3xl">Ayuda cerca de ti en Cali</p>
+        <p class="mt-2 text-tinta-suave">Encuentra voluntariados e iniciativas ciudadanas. Elige una causa y colabora.</p>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <a href="#" data-fuera="El mapa (PT-02)" class="inline-flex min-h-11 items-center rounded-lg bg-vino px-4 font-semibold text-white hover:bg-vino-oscuro">Ver el mapa</a>
+          <a href="#" data-fuera="El registro (PT-05)" class="inline-flex min-h-11 items-center rounded-lg border-2 border-vino px-4 font-semibold text-vino hover:bg-vino-claro">Crear cuenta</a>
+        </div>
+      </div>
+    </section>
+
+    <h1 id="titulo-listado" tabindex="-1" class="mt-6 text-2xl font-bold sm:text-3xl">Iniciativas en Cali</h1>
+
+    <!-- Filtros (RF-024). Se guardan en la URL (DP-06). -->
+    <form id="filtros" role="search" aria-label="Filtrar iniciativas" class="mt-3 space-y-3 lg:flex lg:items-end lg:gap-3 lg:space-y-0">
+      <div class="relative lg:flex-1">
+        <label for="f-texto" class="sr-only">Buscar iniciativas</label>
+        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-tinta-suave" id="icono-buscar"></span>
+        <input id="f-texto" name="q" type="search" placeholder="Buscar por título o lugar"
+               class="h-12 w-full rounded-xl border border-borde bg-white pl-11 pr-3">
+      </div>
+      <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:m-0 lg:overflow-visible lg:p-0">
+        <label class="shrink-0">
+          <span class="sr-only">Categoría</span>
+          <select id="f-categoria" name="categoria" class="h-11 rounded-full border border-borde bg-white px-4">
+            <option value="">Categoría: todas</option>
+          </select>
+        </label>
+        <label class="shrink-0">
+          <span class="sr-only">Tipo de ayuda</span>
+          <select id="f-tipo" name="tipo" class="h-11 rounded-full border border-borde bg-white px-4">
+            <option value="">Tipo de ayuda: todos</option>
+          </select>
+        </label>
+        <label class="shrink-0">
+          <span class="sr-only">Fecha</span>
+          <input id="f-fecha" name="fecha" type="date" class="h-11 rounded-full border border-borde bg-white px-4">
+        </label>
+        <button id="f-limpiar" type="reset" class="h-11 shrink-0 rounded-full px-4 font-medium text-vino underline-offset-4 hover:underline">Limpiar</button>
+      </div>
+    </form>
+
+    <!-- aria-live: el lector de pantalla anuncia el número de resultados -->
+    <p id="conteo" aria-live="polite" class="mt-4 text-sm text-tinta-suave"></p>
+
+    <div id="resultados" class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+
+    <div class="mt-6 text-center">
+      <button id="cargar-mas" type="button" hidden class="min-h-11 rounded-lg border-2 border-vino px-6 font-semibold text-vino hover:bg-vino-claro">Cargar más</button>
+    </div>
+  </main>
+
+  <!-- Menú inferior del celular (DP-02). lg:hidden lo oculta en pantallas grandes. Lo llena comun.js. -->
+  <nav id="menu-inferior" aria-label="Principal" class="fixed inset-x-0 bottom-0 z-30 border-t border-divisor bg-white lg:hidden"></nav>
+
+  <!-- Lógica de la página. En React, este script se repartiría entre el componente
+       de la página (frontend/src/paginas/) y la llamada a la API (frontend/src/api/). -->
+  <script>
+    // ─── Controles del prototipo: simular estados de la API ──────────────────
+    const estadoSimulado = new URLSearchParams(location.search).get('estado') ?? 'normal';
+    pintarBarraPrototipo(`
+      <label class="flex flex-col gap-1">
+        <span>Respuesta de la API</span>
+        <select id="proto-estado" class="rounded-lg border border-borde bg-white px-2 py-1.5">
+          <option value="normal">Normal</option>
+          <option value="cargando">Cargando (sin fin)</option>
+          <option value="error">Error 500</option>
+        </select>
+      </label>`);
+    const selEstado = document.getElementById('proto-estado');
+    selEstado.value = estadoSimulado;
+    selEstado.addEventListener('change', () => {
+      const p = new URLSearchParams(location.search);
+      selEstado.value === 'normal' ? p.delete('estado') : p.set('estado', selEstado.value);
+      location.search = p.toString();
+    });
+
+    pintarNavegacion('inicio');
+
+    // ─── Bienvenida (solo visitantes) ─────────────────────────────────────────
+    const bienvenida = document.getElementById('bienvenida');
+    document.querySelector('#cerrar-bienvenida').innerHTML =
+      icono('cerrar') + '<span class="sr-only">Cerrar bienvenida</span>';
+    let bienvenidaCerrada = false;
+    try { bienvenidaCerrada = sessionStorage.getItem('calida-proto-bienvenida') === 'cerrada'; } catch {}
+    bienvenida.hidden = rolActual() !== 'visitante' || bienvenidaCerrada;
+    document.getElementById('cerrar-bienvenida').addEventListener('click', () => {
+      bienvenida.hidden = true;
+      try { sessionStorage.setItem('calida-proto-bienvenida', 'cerrada'); } catch {}
+      document.getElementById('titulo-listado').focus();
+    });
+
+    // ─── Filtros ──────────────────────────────────────────────────────────────
+    document.getElementById('icono-buscar').innerHTML = icono('buscar');
+    const form = document.getElementById('filtros');
+    const fTexto = document.getElementById('f-texto');
+    const fCategoria = document.getElementById('f-categoria');
+    const fTipo = document.getElementById('f-tipo');
+    const fFecha = document.getElementById('f-fecha');
+    fCategoria.insertAdjacentHTML('beforeend', CATEGORIAS.map((c) => `<option>${esc(c)}</option>`).join(''));
+    fTipo.insertAdjacentHTML('beforeend', TIPOS_AYUDA.map((t) => `<option>${esc(t)}</option>`).join(''));
+
+    // Leer los filtros de la URL al abrir la página (DP-06)
+    const params = new URLSearchParams(location.search);
+    fTexto.value = params.get('q') ?? '';
+    fCategoria.value = params.get('categoria') ?? '';
+    fTipo.value = params.get('tipo') ?? '';
+    fFecha.value = params.get('fecha') ?? '';
+
+    const TAMANO_PAGINA = 6;
+    let visibles = TAMANO_PAGINA;
+
+    function filtrar() {
+      const texto = fTexto.value.trim().toLowerCase();
+      return INICIATIVAS
+        .filter((i) => !texto || `${i.titulo} ${i.lugar} ${i.zona}`.toLowerCase().includes(texto))
+        .filter((i) => !fCategoria.value || i.categoria === fCategoria.value)
+        .filter((i) => !fTipo.value || i.tiposAyuda.includes(fTipo.value))
+        .filter((i) => !fFecha.value || i.fecha.startsWith(fFecha.value))
+        .sort((a, b) => a.fecha.localeCompare(b.fecha));   // RF-023: por fecha de inicio
+    }
+
+    function guardarFiltrosEnUrl() {
+      const p = new URLSearchParams();
+      if (fTexto.value.trim()) p.set('q', fTexto.value.trim());
+      if (fCategoria.value) p.set('categoria', fCategoria.value);
+      if (fTipo.value) p.set('tipo', fTipo.value);
+      if (fFecha.value) p.set('fecha', fFecha.value);
+      if (estadoSimulado !== 'normal') p.set('estado', estadoSimulado);
+      const qs = p.toString();
+      history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+    }
+
+    // ─── Tarjeta de iniciativa (componente TarjetaIniciativa) ─────────────────
+    function tarjeta(i) {
+      const abierta = i.necesidades.find((n) => faltan(n) > 0);
+      const resumen = abierta
+        ? `<p class="text-sm"><strong>Faltan ${faltan(abierta)}</strong>
+             <span class="text-tinta-suave">· ${esc(abierta.nombre)}</span></p>
+           ${barraProgreso(abierta, `${abierta.nombre}: ${abierta.confirmada} de ${abierta.objetivo}`)}`
+        : `<p>${insignia('cubierta')} <span class="text-sm text-tinta-suave">Necesidades completas</span></p>`;
+
+      // "Enlace estirado": todo el artículo es clicable, pero el lector de
+      // pantalla solo lee un enlace (el título), no la tarjeta entera.
+      return `
+        <article class="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-divisor transition hover:-translate-y-0.5 hover:shadow-md">
+          <div class="grid aspect-video place-items-center bg-${i.tinte}">
+            <img src="recursos/${i.ilustracion}.svg" alt="" class="h-32 w-auto max-w-[70%] object-contain">
+          </div>
+          <div class="flex flex-1 flex-col gap-2 p-4">
+            <div>${chip(i.categoria)}</div>
+            <h2 class="text-xl font-semibold leading-snug">
+              <a href="detalle.html?id=${i.id}" class="after:absolute after:inset-0 group-hover:text-vino">${esc(i.titulo)}</a>
+            </h2>
+            <p class="flex items-center gap-2 text-sm text-tinta-suave">${icono('calendario', 'size-4')}${fechaCorta(i.fecha)}</p>
+            <p class="flex items-center gap-2 text-sm text-tinta-suave">${icono('ubicacion', 'size-4')}${esc(i.lugar)}, ${esc(i.zona)}</p>
+            <div class="mt-auto space-y-1.5 pt-2">${resumen}</div>
+          </div>
+        </article>`;
+    }
+
+    // ─── Los tres estados: cargando, vacío/error, datos ───────────────────────
+    const resultados = document.getElementById('resultados');
+    const conteo = document.getElementById('conteo');
+    const cargarMas = document.getElementById('cargar-mas');
+
+    function esqueletos() {
+      cargarMas.hidden = true;
+      conteo.textContent = 'Cargando iniciativas…';
+      resultados.setAttribute('aria-busy', 'true');
+      resultados.innerHTML = Array.from({ length: 3 }, () => `
+        <div class="overflow-hidden rounded-2xl bg-white ring-1 ring-divisor" aria-hidden="true">
+          <div class="aspect-video animate-pulse bg-divisor"></div>
+          <div class="space-y-3 p-4">
+            <div class="h-5 w-24 animate-pulse rounded-full bg-divisor"></div>
+            <div class="h-6 w-3/4 animate-pulse rounded bg-divisor"></div>
+            <div class="h-4 w-1/2 animate-pulse rounded bg-divisor"></div>
+            <div class="h-2.5 w-full animate-pulse rounded-full bg-divisor"></div>
+          </div>
+        </div>`).join('');
+    }
+
+    function mensajeCentral({ ilustracion, titulo, texto, boton }) {
+      return `
+        <div class="col-span-full flex flex-col items-center rounded-2xl bg-white px-6 py-10 text-center ring-1 ring-divisor">
+          <img src="recursos/${ilustracion}.svg" alt="" class="h-28 w-auto">
+          <h2 class="mt-4 text-xl font-semibold">${titulo}</h2>
+          <p class="mt-1 max-w-sm text-tinta-suave">${texto}</p>
+          ${boton}
+        </div>`;
+    }
+
+    function pintarLista() {
+      resultados.removeAttribute('aria-busy');
+      const lista = filtrar();
+      conteo.textContent = lista.length === 1 ? '1 iniciativa' : `${lista.length} iniciativas`;
+
+      if (lista.length === 0) {   // UC-06 A1
+        cargarMas.hidden = true;
+        resultados.innerHTML = mensajeCentral({
+          ilustracion: 'gato_delineado',
+          titulo: 'No hay iniciativas con esos filtros',
+          texto: 'Prueba con otra fecha o categoría.',
+          boton: '<button type="button" id="vacio-limpiar" class="mt-4 min-h-11 rounded-lg bg-vino px-5 font-semibold text-white hover:bg-vino-oscuro">Limpiar filtros</button>',
+        });
+        document.getElementById('vacio-limpiar').addEventListener('click', () => { form.reset(); });
+        return;
+      }
+      resultados.innerHTML = lista.slice(0, visibles).map(tarjeta).join('');
+      cargarMas.hidden = lista.length <= visibles;
+    }
+
+    function pintarError() {
+      conteo.textContent = '';
+      cargarMas.hidden = true;
+      resultados.removeAttribute('aria-busy');
+      resultados.innerHTML = mensajeCentral({
+        ilustracion: 'corazon',
+        titulo: 'No pudimos cargar las iniciativas',
+        texto: 'Revisa tu conexión e inténtalo de nuevo. (La API respondió 500.)',
+        boton: `<button type="button" id="reintentar" class="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg bg-vino px-5 font-semibold text-white hover:bg-vino-oscuro">${icono('reintentar')}Reintentar</button>`,
+      });
+      document.getElementById('reintentar').addEventListener('click', () => {
+        selEstado.value = 'normal';
+        selEstado.dispatchEvent(new Event('change'));
+      });
+    }
+
+    /** Simula fetch('/api/iniciativas'): espera un poco y responde según el control. */
+    function cargar() {
+      esqueletos();
+      if (estadoSimulado === 'cargando') return;
+      setTimeout(() => (estadoSimulado === 'error' ? pintarError() : pintarLista()), 700);
+    }
+
+    form.addEventListener('input', () => { visibles = TAMANO_PAGINA; guardarFiltrosEnUrl(); pintarLista(); });
+    form.addEventListener('reset', () => setTimeout(() => { visibles = TAMANO_PAGINA; guardarFiltrosEnUrl(); pintarLista(); }));
+    form.addEventListener('submit', (e) => e.preventDefault());
+    cargarMas.addEventListener('click', () => { visibles += TAMANO_PAGINA; pintarLista(); });
+
+    cargar();
+  </script>
+</body>
+</html>
