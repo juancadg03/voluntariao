@@ -570,8 +570,8 @@ El cambio tocó cinco documentos:
 | **Monorepo** | Un solo repositorio con varios proyectos (aquí: frontend, backend y compartido). |
 | **MoSCoW** | Método de prioridad: *Must*, *Should*, *Could*, *Won't*. |
 | **MVP / v1** | Primera versión mínima que ya resuelve algo útil. |
-| **Paquete (npm)** | Carpeta con un `package.json`: tiene nombre, versión y dependencias, y otros paquetes lo pueden importar. En Calida hay tres: `@calida/frontend`, `@calida/backend` y `@calida/compartido`. |
 | **ORM** | Librería que traduce objetos del código a tablas y genera el SQL. Calida no usa uno, para aprender SQL directamente. |
+| **Paquete (npm)** | Carpeta con un `package.json`: tiene nombre, versión y dependencias, y otros paquetes lo pueden importar. En Calida hay tres: `@calida/frontend`, `@calida/backend` y `@calida/compartido`. |
 | **Proxy / reescritura** | Un servidor que recibe una petición y la reenvía a otro. Calida lo usa para que la interfaz y la API parezcan un solo sitio. |
 | **Rebanada vertical** | Una función completa, de base de datos a pantalla, construida de una vez. |
 | **Regla de negocio (RN)** | Ley del dominio que se cumple siempre, sin importar la pantalla. |
