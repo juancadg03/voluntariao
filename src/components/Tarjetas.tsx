@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { IniciativaPublica } from "@/types/contratos";
+import type { IniciativaPublica } from "@/lib/publico.types";
 import { fechaVisible } from "@/lib/publico";
 
 export default function Tarjetas({ items }: { items: IniciativaPublica[] }) {

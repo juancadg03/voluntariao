@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Tarjetas from "@/components/Tarjetas";
 import { listar } from "@/lib/publico";
-import type { FiltrosIniciativas } from "@/types/contratos";
+import type { FiltrosIniciativas } from "@/lib/publico.types";
 
 export default async function Explorar({
   searchParams,

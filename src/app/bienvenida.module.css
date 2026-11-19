@@ -1,0 +1,120 @@
+.pagina {
+  display: grid;
+  grid-template-columns: 56% 44%;
+  min-height: 100svh;
+  max-width: none;
+  padding: 0;
+  color: #141414;
+  background: #fff;
+  font-family: Poppins, system-ui, sans-serif;
+  line-height: 1.3;
+}
+
+.acceso {
+  display: grid;
+  place-items: center;
+  background: #faf3e9 url("/calida/fondo.webp") center / cover;
+  padding: clamp(24px, 6vw, 80px) 20px;
+}
+
+.tarjeta {
+  width: min(100%, 420px);
+  padding: clamp(24px, 4vw, 54px);
+  border-radius: 30px;
+  background: rgb(214 224 231 / 96%);
+  text-align: center;
+}
+
+.tarjeta img {
+  display: block;
+  margin: auto;
+  object-fit: contain;
+}
+
+.tarjeta h1,
+.bienvenida h2 {
+  font-family: inherit;
+  max-width: none;
+}
+
+.tarjeta h1 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
+  margin: 18px 0 24px;
+}
+
+.tarjeta form {
+  display: grid;
+  gap: 14px;
+  padding: 0;
+  text-align: left;
+  background: transparent;
+  border: 0;
+}
+
+.tarjeta label {
+  font-size: .75rem;
+  font-weight: 650;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.tarjeta input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #79838a;
+  border-radius: 0;
+  background: #fff;
+  font-size: .9rem;
+}
+
+.tarjeta button {
+  justify-self: center;
+  min-height: 44px;
+  margin-top: 5px;
+  padding-inline: 26px;
+  background: #111;
+  border-radius: 0;
+}
+
+.tarjeta p {
+  margin-bottom: 0;
+  font-size: .875rem;
+}
+
+.bienvenida {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(100%, 650px);
+  margin-inline: auto;
+  padding: clamp(26px, 4.5vw, 80px);
+}
+
+.bienvenida h2 {
+  margin: 0 0 24px;
+  font-size: clamp(1.8rem, 3.25vw, 3.1rem);
+  line-height: 1.05;
+  text-align: center;
+}
+
+.bienvenida p {
+  margin: 0 0 14px;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+}
+
+.bienvenida a {
+  align-self: flex-end;
+  padding-block: 10px;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .pagina {
+    grid-template-columns: 1fr;
+  }
+
+  .bienvenida {
+    grid-row: 1;
+  }
+}

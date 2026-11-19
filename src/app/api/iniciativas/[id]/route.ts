@@ -1,5 +1,5 @@
 import { detalle } from "@/lib/publico";
-import type { DetalleIniciativa } from "@/types/contratos";
+import type { DetalleIniciativa } from "@/lib/publico.types";
 
 export async function GET(
   _: Request,

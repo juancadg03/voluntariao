@@ -1,38 +1,43 @@
-import Link from "next/link";
-import Tarjetas from "@/components/Tarjetas";
-import { listar } from "@/lib/publico";
+"use client";
 
-export const dynamic = "force-dynamic";
+import Link from "next/link";
+import { useState } from "react";
+import styles from "./bienvenida.module.css";
+
 export default function Inicio() {
-  const { data } = listar();
-  const proximas = data
-    .filter(
-      (i) =>
-        ["publicada", "en_preparacion", "lista"].includes(i.estado) &&
-        Date.parse(i.fecha_inicio) >= Date.now(),
-    )
-    .sort((a, b) => Date.parse(a.fecha_inicio) - Date.parse(b.fecha_inicio));
-  const pendientes = proximas.filter((i) =>
-    i.necesidades.some((n) => n.cantidad_confirmada < n.cantidad_objetivo),
-  );
-  const recientes = [...data].sort(
-    (a, b) => Date.parse(b.publicada_en) - Date.parse(a.publicada_en),
-  );
+  const [mensaje, setMensaje] = useState("");
+
   return (
-    <>
-      <section className="portada">
-        <small>Voluntariado en Colombia</small>
-        <h1>Encuentra dónde ayudar.</h1>
-        <Link className="boton" href="/iniciativas">
-          Explorar iniciativas →
-        </Link>
+    <main className={styles.pagina}>
+      <section className={styles.acceso} aria-labelledby="titulo-acceso">
+        <div className={styles.tarjeta}>
+          <img src="/calida/logo.svg" alt="Cálida" width="108" height="48" />
+          <h1 id="titulo-acceso">Iniciar sesión</h1>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              setMensaje("El inicio de sesión aún no está disponible. Puedes explorar las iniciativas sin una cuenta.");
+            }}
+          >
+            <label>
+              Correo electrónico
+              <input type="email" autoComplete="username" placeholder="nombre@ejemplo.com" required />
+            </label>
+            <label>
+              Contraseña
+              <input type="password" autoComplete="current-password" required />
+            </label>
+            <button type="submit">Iniciar sesión</button>
+          </form>
+          {mensaje && <p role="status">{mensaje}</p>}
+        </div>
       </section>
-      <h2>Aún necesitan ayuda</h2>
-      <Tarjetas items={pendientes} />
-      <h2>Próximas jornadas</h2>
-      <Tarjetas items={proximas} />
-      <h2>Recién publicadas</h2>
-      <Tarjetas items={recientes} />
-    </>
+      <section className={styles.bienvenida} aria-labelledby="titulo-bienvenida">
+        <h2 id="titulo-bienvenida">¡Te damos la bienvenida a Cálida!</h2>
+        <p>Encuentra voluntariados e iniciativas ciudadanas en Cali. Elige una causa y colabora.</p>
+        <p>¿Tienes una iniciativa?<br />Compártela y encuentra personas que te ayuden.</p>
+        <Link href="/iniciativas">Ver iniciativas</Link>
+      </section>
+    </main>
   );
 }

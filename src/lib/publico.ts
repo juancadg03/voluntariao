@@ -2,7 +2,7 @@ import type {
   FiltrosIniciativas,
   IniciativaPublica,
   ListaIniciativas,
-} from "@/types/contratos";
+} from "@/lib/publico.types";
 
 const ejemplos = [
   [
