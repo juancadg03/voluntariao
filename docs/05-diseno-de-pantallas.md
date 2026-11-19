@@ -21,7 +21,7 @@ Decidir **cómo se ve y se usa** Calida antes de escribir componentes de React. 
 | RNF-014 | WCAG 2.1 AA: contraste, teclado, etiquetas. |
 | RNF-019 | Imágenes de listado de menos de 300 KB, en WebP. |
 | `imgs/raw/logo3.webp`, `imgs/svg/logo3a.svg` y `logo3b.svg` | Logo oficial (decisión del 14/11/2026). |
-| `imgs/mockups/login.png` y `fondo.png` | Idea del inicio de sesión y collage de fondo. |
+| `imgs/mockups/login.png`, `fondo2.png` y `fondo1.png` | Idea del inicio de sesión, collage de fondo actual y collage anterior. |
 
 ## 2. Inventario de pantallas
 
@@ -436,7 +436,7 @@ Son variaciones de patrones que ya aparecen arriba:
 
 ### 5.2 Colores
 
-Los colores se sacaron de los archivos: el vino es el `fill` exacto de `logo3a.svg`, la crema es el fondo de `logo3.webp` y los acentos son el promedio de cada tono del collage `fondo.png`. Los contrastes se calcularon con la fórmula de WCAG: el texto normal necesita **4.5:1** y los bordes de controles o el texto grande, **3:1**.
+Los colores se sacaron de los archivos: el vino es el `fill` exacto de `logo3a.svg`, la crema es el fondo de `logo3.webp` y los acentos son el promedio de cada tono del collage anterior `fondo1.png`. Los contrastes se calcularon con la fórmula de WCAG: el texto normal necesita **4.5:1** y los bordes de controles o el texto grande, **3:1**.
 
 **Base**
 
@@ -522,7 +522,7 @@ Son las piezas que luego serán componentes de React en `frontend/src/componente
 ### 5.6 Ilustraciones y el collage
 
 - **El collage va solo en** PT-04 y PT-05 (inicio de sesión y registro) y en la franja de bienvenida de PT-01. Detrás de una lista o un formulario largo cansa la vista y compite con el contenido.
-- **Peso:** `fondo.png` pesa 1.9 MB y `finalfinal.svg`, 110 MB. Para la web se usa una versión **WebP de 1200 px (unos 220 KB, probada)**, que cumple RNF-019. Los SVG gigantes no se publican.
+- **Peso:** `fondo2.png` pesa 7.8 MB (sale de `fondo2.svg`, 28 MB) y `finalfinal.svg`, 110 MB. Para la web se usa una versión **WebP de 1200 px (unos 220 KB, probada)**, que cumple RNF-019. Los SVG gigantes no se publican.
 - **Ilustraciones sueltas** (`persona_caja`, `corazon`, `cristorey`, `ermita`) para estados vacíos y la página 404. También se revisa su peso antes de usarlas: `abrazo.svg` pesa 11 MB.
 - Las ilustraciones decorativas llevan `alt=""` para que el lector de pantalla no las lea.
 
