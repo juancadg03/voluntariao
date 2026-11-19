@@ -409,7 +409,7 @@ Lo más valioso es el **motivo**. Dentro de seis meses alguien (tú mismo) pregu
 | Paso | Qué se hace | Qué se aprende | Estado |
 |---|---|---|---|
 | 1 | Convenciones de Git en [`CONTRIBUTING.md`](../CONTRIBUTING.md): ramas `tipo/descripcion`, commits en español con verbo en infinitivo ("Agregar…", "Corregir…"), todo entra a `main` por Pull Request con "Squash and merge". Plantilla de PR en `.github/`. | Flujo de trabajo en equipo. | ✅ |
-| 2 | `.nvmrc` y `engines` con la versión de Node. | Por qué se fijan las versiones. | ⏳ |
+| 2 | Node 24 (LTS) fijado en `.nvmrc` (para `nvm use`) y en `engines` del `package.json`; `.npmrc` con `engine-strict=true` hace que `npm install` falle con otra versión. | Por qué se fijan las versiones. | ✅ |
 | 3 | Monorepo con npm workspaces: `frontend/` (Vite + React), `backend/` (Express), `compartido/` (aquí se mueve `lib/contratos.js`, pendiente 6 de [04 §14](04-arquitectura.md)). | Qué es un paquete de npm y un *workspace*. | ⏳ |
 | 4 | `docker-compose.yml` con PostgreSQL + PostGIS, `.env.example` y el script de migraciones. | Contenedores, variables de entorno, migraciones. | ⏳ |
 | 5 | Esqueleto caminante: `GET /api/salud` consulta la base y la pantalla de React muestra "API y base conectadas". | El *proxy* de Vite y el viaje completo de una petición. | ⏳ |
@@ -559,8 +559,10 @@ El cambio tocó cinco documentos:
 | **Hash** | Resultado de una función que convierte un texto en otro, de forma que no se puede volver al original. Sirve para guardar contraseñas sin conocerlas. |
 | **Índice** | Estructura de datos de la base que acelera una búsqueda. |
 | **JSON** | Formato de texto para enviar datos entre la interfaz y la API. |
+| **LTS** | *Long Term Support*: versión de un programa con arreglos de seguridad garantizados por varios años. Node saca una LTS cada octubre (las versiones pares). |
 | **Linter** | Programa que lee el código sin ejecutarlo y avisa de errores probables (una variable que no existe, una que nunca se usa). En Calida: ESLint. |
 | **JWT** | *JSON Web Token*: texto firmado por el servidor que dice quién es el usuario. Si alguien lo modifica, la firma deja de coincidir. Calida lo estudió y lo descartó (ver L-04). |
+| **nvm** | *Node Version Manager*: instala varias versiones de Node y cambia entre ellas. `nvm use` lee la versión del archivo `.nvmrc`. |
 | **Middleware** | Función que se ejecuta antes del controlador en cada petición, por ejemplo para revisar la sesión. |
 | **Migración** | Archivo versionado con un cambio a la estructura de la base de datos. |
 | **Mobile-first** | Diseñar primero para la pantalla del celular y después ampliar para el escritorio. |

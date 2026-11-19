@@ -1,0 +1,8 @@
+{
+  "name": "calida",
+  "private": true,
+  "description": "Plataforma de voluntariado en Cali. Ver README.md y docs/00-guia-de-proyecto.md.",
+  "engines": {
+    "node": ">=24 <25"
+  }
+}

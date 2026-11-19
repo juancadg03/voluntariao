@@ -97,7 +97,7 @@ flowchart TB
 | Hosting | Vercel (interfaz), Render (API), Neon (base) | Confirmado (ADR-25) | Desplegar un sistema de tres piezas. |
 | Control de versiones | Git + GitHub + GitHub Actions | Propuesto | CI con pruebas y lint en cada cambio. |
 
-**Versión de Node.js:** la LTS vigente, fijada en `.nvmrc` y en `engines` del `package.json`.
+**Versión de Node.js:** 24 (LTS), fijada en `.nvmrc` y en `engines` del `package.json`. Tiene soporte de seguridad hasta abril de 2028. Node 26 ya es LTS desde octubre de 2026, pero 24 es la que seguro soportan Vercel y Render; se cambia cuando haga falta.
 
 ## 5. Arquitectura lógica de la aplicación
 
