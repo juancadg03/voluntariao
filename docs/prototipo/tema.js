@@ -1,4 +1,24 @@
-// Tokens de diseño de Calida (docs/05-diseno-de-pantallas.md §5.2 a §5.4).
+// ═══════════════════════════════════════════════════════════════════════════
+// tema.js · Los tokens de diseño de Calida (colores y fuente)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// QUÉ ES
+//   No es una vista. Es el "diccionario visual" que comparten las tres
+//   pantallas: cada color tiene un nombre (vino, crema, tinta…) y las páginas
+//   usan ese nombre, nunca el código hexadecimal. Un "token de diseño" es eso:
+//   una decisión de diseño con nombre.
+//
+// POR QUÉ EXISTE
+//   Si mañana el vino cambia de tono, se cambia aquí y cambian las tres
+//   pantallas a la vez. Los valores y sus contrastes están justificados en
+//   docs/05-diseno-de-pantallas.md §5.2 a §5.4.
+//
+// POR QUÉ SE CARGA ANTES QUE TAILWIND
+//   Este archivo crea una etiqueta <style> con los colores. Tailwind la lee
+//   para inventar clases como bg-vino o text-tinta. Si Tailwind cargara
+//   primero, todavía no conocería esos nombres.
+//
+// Origen de los valores: docs/05-diseno-de-pantallas.md §5.2 a §5.4.
 //
 // En el proyecto real esto irá en frontend/src/index.css, así:
 //   @import "tailwindcss";

@@ -1,4 +1,41 @@
 <!doctype html>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  entrar.html · PT-04 · Iniciar sesión
+  ═══════════════════════════════════════════════════════════════════════════
+
+  QUÉ VISTA ES
+    El formulario de correo y contraseña para entrar a Calida.
+    · Diseño: docs/05-diseno-de-pantallas.md §4 (boceto de PT-04), basado en
+      el mockup imgs/mockups/login.png.
+    · Caso de uso: UC-02 "Iniciar sesión" (docs/02-casos-de-uso.md).
+    · En la app real: la ruta "/entrar", con POST /api/cuentas/sesion.
+      El servidor responde con una cookie de sesión (aprendizajes/03-sesiones.md).
+
+  POR QUÉ ESTÁ EN EL PROTOTIPO
+    Es la puerta de entrada para inscribirse y publicar, y tiene varios
+    casos difíciles de imaginar sin probarlos: errores de cada campo, un
+    mensaje que no revela si el correo existe, el bloqueo tras varios
+    intentos y el regreso seguro a la página de la que venías.
+
+  QUÉ PARTES TIENE
+    1. Barra del prototipo: elegir si entras como voluntario u organización.
+    2. Mitad izquierda: la tarjeta con el formulario sobre el collage (DP-04).
+       En el celular es lo único que se ve.
+    3. Mitad derecha: el texto de bienvenida (solo escritorio, como el mockup).
+    Esta pantalla NO tiene encabezado ni menú inferior: es un paso aparte.
+
+  QUÉ PROBAR
+    · Enviar con campos vacíos o un correo mal escrito → error bajo el campo.
+    · Una contraseña mala → "Correo o contraseña incorrectos" (401).
+    · Tres contraseñas malas → bloqueo de 30 s (423). La real: 15 min (RF-007).
+    · La contraseña buena es calida123 → vuelve a la página de "?siguiente=".
+
+  CÓMO SE CONECTA CON LO DEMÁS
+    · comun.js     → guarda el rol elegido (cambiarRol), como si fuera la sesión.
+    · detalle.html → envía aquí al visitante con ?siguiente=detalle.html?id=N.
+    · index.html   → "Ver iniciativas sin cuenta".
+-->
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -65,7 +102,10 @@
 
   <p class="bg-crema py-3 text-center lg:hidden"><a href="index.html" class="font-semibold text-vino underline">Ver iniciativas sin cuenta →</a></p>
 
+  <!-- Lógica de la página: el ojo de la contraseña, la validación, el bloqueo
+       por intentos fallidos y el envío simulado. -->
   <script>
+    // ─── Controles del prototipo: con qué rol entrar si la contraseña es correcta ─
     pintarBarraPrototipo(`
       <label class="flex flex-col gap-1">
         <span>Entrar como</span>
@@ -113,6 +153,7 @@
       campo.addEventListener('input', () => campo.getAttribute('aria-invalid') === 'true' && validar(campo));
     }
 
+    // Error general (arriba del formulario), para lo que no es culpa de un solo campo
     function mostrarError(texto) {
       errorGeneral.className = 'flex gap-2 rounded-lg bg-error-claro p-3 text-sm text-error';
       errorGeneral.innerHTML = `${icono('alerta')}<span>${texto}</span>`;

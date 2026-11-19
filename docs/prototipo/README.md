@@ -27,6 +27,8 @@ Y abre `http://localhost:8000` en el navegador. Se necesita internet, porque Tai
 
 ## Cómo está hecho
 
+Cada archivo empieza con un bloque de comentarios que explica qué vista es (o qué piezas comparte), por qué está en el prototipo, qué partes y estados tiene y con qué otros archivos se conecta. Dentro del código, cada sección tiene su propio comentario.
+
 | Archivo | Qué tiene | En el proyecto real será… |
 |---|---|---|
 | `tema.js` | Los **tokens de diseño** (colores, fuente) en un bloque `@theme` de Tailwind v4. | `frontend/src/index.css` |

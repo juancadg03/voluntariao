@@ -1,8 +1,35 @@
-// Piezas compartidas del prototipo: datos de ejemplo, sesión simulada,
-// íconos, encabezado, menús y avisos. En el proyecto real cada una será un
-// componente de React o una función de frontend/src/api/.
+// ═══════════════════════════════════════════════════════════════════════════
+// comun.js · Piezas compartidas por las tres pantallas del prototipo
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// QUÉ ES
+//   No es una vista: es la "caja de herramientas" que usan index.html,
+//   detalle.html y entrar.html. Cada página lo carga con <script src="comun.js">
+//   ANTES de su propio script, así que todo lo de aquí queda disponible para ellas.
+//
+// POR QUÉ EXISTE
+//   Para no repetir lo mismo en cada página. Si el encabezado o los datos
+//   cambian, se cambian aquí una sola vez. Es lo mismo que harán los
+//   componentes de React: escribir una pieza una vez y usarla en muchas pantallas.
+//
+// QUÉ CONTIENE (en este orden)            EN LA APP REAL SERÁ…
+//   1. Datos de ejemplo (INICIATIVAS)     → la respuesta de GET /api/iniciativas
+//   2. Catálogos y usuario de ejemplo     → las tablas categorias y tipos_ayuda
+//   3. Utilidades (esc, fechas, faltan)   → funciones en frontend/src/
+//   4. Sesión simulada con localStorage   → la cookie y GET /api/cuentas/yo
+//   5. Íconos SVG                         → un componente <Icono>
+//   6. Componentes pequeños (chip, insignia, barra de progreso)
+//                                         → <Chip>, <InsigniaEstado>, <BarraProgreso>
+//   7. Aviso emergente (toast)            → el componente <Aviso>
+//   8. Encabezado y menús según el rol    → <MenuSuperior> y <MenuInferior>
+//   9. Barra amarilla del prototipo       → NO existirá: es solo para probar
+//
+// Los nombres de los componentes vienen de docs/05-diseno-de-pantallas.md §5.5.
 
-// ─── Datos de ejemplo (imitan la respuesta de GET /api/iniciativas) ────────
+// ─── 1. Datos de ejemplo (imitan la respuesta de GET /api/iniciativas) ─────
+// Ocho iniciativas inventadas para ver la interfaz con contenido realista.
+// Cada una tiene sus "necesidades": lo concreto que pide (personas, mercados,
+// viajes), con la meta (objetivo) y cuántos ya están confirmados.
 
 const INICIATIVAS = [
   {
@@ -108,18 +135,20 @@ const INICIATIVAS = [
   },
 ];
 
-// Catálogos (en la app real vienen de las tablas categorias y tipos_ayuda)
+// ─── 2. Catálogos y usuario de ejemplo ────────────────────────────────────
+// Catálogos: las opciones de los filtros (en la app real vienen de las tablas
+// categorias y tipos_ayuda, y el administrador puede agregar más: RF-016).
 const CATEGORIAS = ['Salud', 'Educación', 'Infancia', 'Adulto mayor', 'Alimentación',
   'Medio ambiente', 'Cultura', 'Derechos humanos', 'Incidencia social'];
 const TIPOS_AYUDA = ['Mano de obra', 'Donaciones', 'Transporte', 'Asesoría'];
 
-// Usuario de ejemplo para cuando hay sesión
+// Usuario de ejemplo para cuando hay sesión (aparece, por ejemplo, en la hoja de inscripción)
 const USUARIO_DEMO = {
   voluntario: { nombre: 'Ana Gómez', correo: 'ana@correo.com' },
   organizacion: { nombre: 'Fundación Manos Unidas', correo: 'contacto@manosunidas.org' },
 };
 
-// ─── Utilidades ────────────────────────────────────────────────────────────
+// ─── 3. Utilidades ─────────────────────────────────────────────────────────
 
 /** Escapa texto antes de meterlo en innerHTML. React lo hace solo; aquí, a mano. */
 function esc(texto) {
@@ -127,6 +156,8 @@ function esc(texto) {
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 }
 
+// Formatos de fecha en español de Colombia: "sáb 22 nov · 9:00" y "Sábado 22 de noviembre · 9:00".
+// Intl.DateTimeFormat viene en el navegador; no hace falta ninguna librería.
 const fmtCorta = new Intl.DateTimeFormat('es-CO', { weekday: 'short', day: 'numeric', month: 'short' });
 const fmtLarga = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
 const fmtHora = new Intl.DateTimeFormat('es-CO', { hour: 'numeric', minute: '2-digit' });
@@ -141,6 +172,7 @@ function fechaLarga(iso) {
   return `${texto[0].toUpperCase()}${texto.slice(1)} · ${fmtHora.format(d)}`;
 }
 
+/** Cuántas unidades faltan para completar una necesidad (nunca menos de 0). */
 function faltan(n) { return Math.max(0, n.objetivo - n.confirmada); }
 
 /** Estado de la necesidad (RF-019), simplificado para el prototipo. */
@@ -151,6 +183,8 @@ function estadoNecesidad(n) {
 }
 
 // Lectura y escritura de localStorage protegidas: en modo privado puede fallar.
+// localStorage guarda texto en el navegador y sobrevive a recargar la página;
+// por eso el prototipo "recuerda" el rol y las inscripciones de prueba.
 function leer(clave, porDefecto) {
   try { const v = localStorage.getItem(clave); return v === null ? porDefecto : JSON.parse(v); }
   catch { return porDefecto; }
@@ -159,7 +193,7 @@ function guardar(clave, valor) {
   try { localStorage.setItem(clave, JSON.stringify(valor)); } catch { /* sin almacenamiento */ }
 }
 
-// ─── Sesión simulada ───────────────────────────────────────────────────────
+// ─── 4. Sesión simulada ────────────────────────────────────────────────────
 // En la app real el rol viene de GET /api/cuentas/yo (cookie de sesión).
 
 const ROLES = { visitante: 'Visitante', voluntario: 'Voluntario', organizacion: 'Organización' };
@@ -174,7 +208,9 @@ function registrarInscripcion(idNecesidad, cantidad) {
   guardar('calida-proto-inscripciones', todas);
 }
 
-// ─── Íconos (trazos de 24 × 24, estilo Lucide) ─────────────────────────────
+// ─── 5. Íconos (trazos de 24 × 24, estilo Lucide) ──────────────────────────
+// Cada ícono es el dibujo (los <path>) de un SVG. icono('buscar') arma el SVG completo.
+// aria-hidden="true": el lector de pantalla los ignora, porque siempre van junto a un texto.
 
 const TRAZOS = {
   inicio: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
@@ -205,7 +241,11 @@ function icono(nombre, clases = 'size-5') {
   return `<svg class="${clases} shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TRAZOS[nombre]}</svg>`;
 }
 
-// ─── Componentes pequeños ──────────────────────────────────────────────────
+// ─── 6. Componentes pequeños ───────────────────────────────────────────────
+// Funciones que devuelven un trozo de HTML como texto. Las páginas las meten
+// con innerHTML. En React serán componentes, que hacen lo mismo con JSX.
+
+/** Etiqueta redondeada: la categoría o un tipo de ayuda. */
 
 function chip(texto, clases = 'bg-vino-claro text-vino') {
   return `<span class="inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium ${clases}">${esc(texto)}</span>`;
@@ -235,7 +275,9 @@ function barraProgreso(n, etiqueta) {
     </div>`;
 }
 
-// ─── Aviso emergente (toast) ───────────────────────────────────────────────
+// ─── 7. Aviso emergente (toast) ────────────────────────────────────────────
+// Un mensaje breve abajo de la pantalla que se borra solo a los 3,5 s.
+// role="status" hace que el lector de pantalla lo lea en voz alta.
 
 function avisar(mensaje) {
   let caja = document.getElementById('avisos');
@@ -251,7 +293,11 @@ function avisar(mensaje) {
   avisar.t = setTimeout(() => { caja.innerHTML = ''; }, 3500);
 }
 
-/** Enlaces a pantallas que existen en el diseño pero no en este prototipo. */
+/**
+ * Enlaces a pantallas que existen en el diseño pero no en este prototipo.
+ * Llevan el atributo data-fuera="Nombre (PT-xx)". Al hacer clic, en vez de
+ * llevar a una página rota, avisa que esa pantalla todavía no está hecha.
+ */
 document.addEventListener('click', (e) => {
   const enlace = e.target.closest('[data-fuera]');
   if (!enlace) return;
@@ -259,7 +305,9 @@ document.addEventListener('click', (e) => {
   avisar(`${enlace.dataset.fuera} no está en el prototipo (ver docs/05).`);
 });
 
-// ─── Encabezado y menús según el rol (docs/05 §3.1) ────────────────────────
+// ─── 8. Encabezado y menús según el rol (docs/05 §3.1) ─────────────────────
+// Cada rol ve opciones distintas. "href" lleva a una página del prototipo;
+// "fuera" marca una pantalla que aún no está hecha (ver data-fuera arriba).
 
 const MENUS = {
   visitante: [
@@ -336,7 +384,7 @@ function pintarNavegacion(actual) {
     </ul>`;
 }
 
-// ─── Barra de controles del prototipo ──────────────────────────────────────
+// ─── 9. Barra de controles del prototipo ───────────────────────────────────
 // No es parte del diseño: sirve para ver la misma pantalla con otro rol o
 // en otro estado (cargando, vacío, error) sin tener un backend.
 

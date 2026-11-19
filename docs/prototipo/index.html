@@ -1,19 +1,69 @@
 <!doctype html>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  index.html · PT-01 · Inicio: listado de iniciativas y filtros
+  ═══════════════════════════════════════════════════════════════════════════
+
+  QUÉ VISTA ES
+    La pantalla principal de Calida: la primera que ve cualquier persona.
+    Muestra las iniciativas publicadas en tarjetas y deja filtrarlas.
+    · Diseño: docs/05-diseno-de-pantallas.md §4 (boceto de PT-01).
+    · Caso de uso: UC-06 "Explorar iniciativas" (docs/02-casos-de-uso.md).
+    · En la app real: la ruta "/" de React, que llama a GET /api/iniciativas.
+
+  POR QUÉ ESTÁ EN EL PROTOTIPO
+    Es la pantalla más usada y la que más decisiones de diseño reúne:
+    tarjetas, filtros, estados de carga y error, y la diferencia entre
+    visitante y usuario con sesión. Probarla aquí, sin backend, es más
+    barato que descubrir los problemas ya en React.
+
+  QUÉ PARTES TIENE (de arriba abajo)
+    1. Barra amarilla del prototipo (#barra-prototipo). NO es parte del
+       diseño: sirve para cambiar de rol y simular respuestas de la API.
+    2. Encabezado (#encabezado). Lo pinta comun.js según el rol (DP-02).
+    3. Franja de bienvenida (#bienvenida). Solo para visitantes; se puede
+       cerrar (DP-04: el collage solo aparece aquí, en entrar y en registro).
+    4. Filtros (#filtros): texto, categoría, tipo de ayuda y fecha. Se
+       guardan en la URL para poder compartirlos y recargar (DP-06, RF-024).
+    5. Conteo de resultados (#conteo), anunciado al lector de pantalla.
+    6. Resultados (#resultados) y botón "Cargar más" (6 por página).
+    7. Menú inferior (#menu-inferior), solo en el celular (DP-02).
+
+  QUÉ ESTADOS SE PUEDEN VER
+    · Normal: las tarjetas con datos de comun.js.
+    · Cargando: tarjetas grises "esqueleto" (con ?estado=cargando).
+    · Vacío: ningún resultado con esos filtros (UC-06 A1).
+    · Error: la API respondió 500 (con ?estado=error), con botón Reintentar.
+
+  CÓMO SE CONECTA CON LO DEMÁS
+    · tema.js       → colores y fuente (tokens de diseño).
+    · comun.js      → datos de ejemplo, íconos, encabezado, chips, barras.
+    · detalle.html  → cada tarjeta enlaza a detalle.html?id=N.
+-->
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calida · Iniciativas en Cali</title>
+  <!-- Fuente Poppins (docs/05 §5.3). "preconnect" abre la conexión antes para que cargue más rápido. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- El ORDEN importa:
+       1. tema.js va antes de Tailwind, para que sus colores ya existan cuando Tailwind lea la página.
+       2. Tailwind (desde un CDN) genera el CSS en el navegador a partir de las clases del HTML.
+       3. comun.js va antes del <script> de esta página, porque ese script usa sus funciones. -->
   <script src="tema.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
   <script src="comun.js"></script>
 </head>
 <!-- PT-01 · Inicio: listado y filtros (docs/05 §4, UC-06) -->
+<!-- pb-20: deja espacio abajo para que el menú inferior fijo no tape el contenido en el celular -->
 <body class="min-h-screen pb-20 lg:pb-0">
+  <!-- Enlace "Saltar al contenido": invisible hasta el primer Tab. Quien navega con teclado
+       se salta el menú y llega directo a la lista (accesibilidad, docs/05 §6). -->
   <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">Saltar al contenido</a>
+  <!-- Contenedores vacíos que llena comun.js: la barra del prototipo y el encabezado -->
   <div id="barra-prototipo"></div>
   <header id="encabezado" class="sticky top-0 z-30 border-b border-divisor bg-crema/95 backdrop-blur"></header>
 
@@ -74,8 +124,11 @@
     </div>
   </main>
 
+  <!-- Menú inferior del celular (DP-02). lg:hidden lo oculta en pantallas grandes. Lo llena comun.js. -->
   <nav id="menu-inferior" aria-label="Principal" class="fixed inset-x-0 bottom-0 z-30 border-t border-divisor bg-white lg:hidden"></nav>
 
+  <!-- Lógica de la página. En React, este script se repartiría entre el componente
+       de la página (frontend/src/paginas/) y la llamada a la API (frontend/src/api/). -->
   <script>
     // ─── Controles del prototipo: simular estados de la API ──────────────────
     const estadoSimulado = new URLSearchParams(location.search).get('estado') ?? 'normal';
